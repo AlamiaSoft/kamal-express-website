@@ -176,7 +176,7 @@ export default function InquiryModal({ isOpen, onClose, prefilledService, prefil
 
               <div className="flex gap-3 justify-center pt-2">
                 <a
-                  href={`https://wa.me/+923000590935?text=Hi%20Kamal%20Express,%20I%20just%20submitted%20inquiry%20ticket%20${successTicket.id}%20for%20${successTicket.serviceType}.%20Please%20assist%20me.`}
+                  href={`https://wa.me/923000590935?text=${encodeURIComponent(`Hi Kamal Express, I just submitted inquiry ticket ${successTicket.id} for ${successTicket.serviceType}. Please assist me.`)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors"

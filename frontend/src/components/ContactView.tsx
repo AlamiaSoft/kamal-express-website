@@ -179,7 +179,7 @@ export default function ContactView() {
                 Skip form completions. Speak directly to our visa pre-screens team via a secure, active WhatsApp chat now.
               </p>
               <a
-                href="https://wa.me/92512726807?text=Hi%20Kamal%20Express,%20I'm%20visiting%20your%20website%20and%20want%2520to%20know%20more."
+                href={`https://wa.me/92512726807?text=${encodeURIComponent("Hi Kamal Express, I'm visiting your website and want to know more.")}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full inline-flex items-center justify-center bg-white text-emerald-950 font-bold text-xs py-2.5 rounded-lg hover:bg-emerald-50 shadow-sm transition-colors"
@@ -385,7 +385,7 @@ export default function ContactView() {
                 {/* Direct WhatsApp acceleration block */}
                 <div className="pt-2">
                   <a
-                    href={`https://wa.me/923000590935?text=Hi%20Kamal%20Express,%20I'm%20tracking%20my%20contact%20ticket%20${tk.id}.%20Can%20you%20please%20accelerate%20my%20visa/flight%20consultancy?`}
+                    href={`https://wa.me/923000590935?text=${encodeURIComponent(`Hi Kamal Express, I'm tracking my contact ticket ${tk.id}. Can you please accelerate my visa/flight consultancy?`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full inline-flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs py-2 rounded-lg transition-colors"

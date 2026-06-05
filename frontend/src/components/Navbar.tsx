@@ -35,7 +35,7 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="https://wa.me/923000590935?text=Hi%20Kamal%20Express,%20I%20would%20like%20to%20inquire%20about%20your%20services."
+              href={`https://wa.me/923000590935?text=${encodeURIComponent("Hi Kamal Express, I would like to inquire about your services.")}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1 text-emerald-300 hover:text-white transition-colors"

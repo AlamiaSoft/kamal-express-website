@@ -725,7 +725,9 @@ export default function AdminView() {
                       <span>Send Mail</span>
                     </a>
                     <a
-                      href={`https://wa.me/${selectedInquiry.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(selectedInquiry.name)},%20this%20is%20Kamal%20Express%2520regarding%252520your%25252520inquiry%2525252520${selectedInquiry.reference_id}.`}
+                      href={`https://wa.me/${selectedInquiry.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                        `Hi ${selectedInquiry.name}, this is Kamal Express regarding your inquiry ${selectedInquiry.reference_id}.`
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-emerald-850 text-[10px] font-extrabold transition-all border border-emerald-200/30"
