@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { 
-  Lock, User, LogOut, Search, Filter, Download, 
-  Phone, Mail, MessageSquare, Save, X, Calendar, 
+import {
+  Lock, User, LogOut, Search, Filter, Download,
+  Phone, Mail, MessageSquare, Save, X, Calendar,
   CheckCircle, Clock, AlertCircle, RefreshCw, Layers,
   ChevronRight, ArrowRight, Shield, Globe, Award
 } from 'lucide-react';
@@ -97,7 +97,7 @@ export default function AdminView() {
       if (!response.ok) {
         throw new Error(data.message || 'Authentication failed.');
       }
-      
+
       sessionStorage.setItem('ke_admin_token', data.token);
       sessionStorage.setItem('ke_admin_user', data.username);
       setToken(data.token);
@@ -127,7 +127,7 @@ export default function AdminView() {
   const handleUpdateInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedInquiry) return;
-    
+
     setIsSaving(true);
     try {
       const response = await fetch(`/api/admin/inquiries/${selectedInquiry.id}`, {
@@ -148,7 +148,7 @@ export default function AdminView() {
       if (!response.ok) {
         throw new Error('Failed to update inquiry.');
       }
-      
+
       // Update local state list
       setInquiries(prev => prev.map(item => {
         if (item.id === selectedInquiry.id) {
@@ -182,7 +182,7 @@ export default function AdminView() {
 
   // Filter inquiries
   const filteredInquiries = inquiries.filter(item => {
-    const matchesSearch = 
+    const matchesSearch =
       item.reference_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -203,10 +203,10 @@ export default function AdminView() {
   // CSV Export Utility
   const handleExportCSV = () => {
     if (filteredInquiries.length === 0) return;
-    
+
     // Header
     const headers = ['Reference ID', 'Date', 'Name', 'Email', 'Phone', 'Service Type', 'Destination', 'Client Notes', 'Admin Remarks', 'Status'];
-    
+
     // Rows
     const rows = filteredInquiries.map(item => [
       item.reference_id,
@@ -221,9 +221,9 @@ export default function AdminView() {
       item.status
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," 
+    const csvContent = "data:text/csv;charset=utf-8,"
       + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -237,12 +237,12 @@ export default function AdminView() {
     /* ==================== 1. VUEXY INSPIRED LOGIN ==================== */
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center lg:grid lg:grid-cols-12 relative overflow-hidden font-sans">
-        
+
         {/* Left Side Brand Column - Vuexy Style */}
         <div className="hidden lg:flex lg:col-span-8 bg-slate-900 min-h-screen flex-col justify-between p-12 relative overflow-hidden">
           <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#076eff_1px,transparent_1px)] [background-size:16px_16px]"></div>
           <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
-          
+
           <div className="relative z-10">
             <img
               src="/logo.jpeg"
@@ -274,7 +274,7 @@ export default function AdminView() {
         {/* Right Side Login Form Column */}
         <div className="col-span-12 lg:col-span-4 min-h-screen flex items-center justify-center p-8 bg-white relative">
           <div className="max-w-md w-full space-y-8 text-left">
-            
+
             {/* Mobile Branding Header */}
             <div className="lg:hidden text-center space-y-4 mb-10">
               <img
@@ -286,7 +286,7 @@ export default function AdminView() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight hidden lg:block">Welcome to Staff Portal! 👋</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight hidden lg:block">Welcome to Staff Portal!</h2>
               <p className="text-slate-450 text-xs sm:text-sm font-semibold">
                 Please sign-in to your admin credentials and start monitoring active agency inquiries.
               </p>
@@ -359,10 +359,10 @@ export default function AdminView() {
   /* ==================== 2. VUEXY INSPIRED DASHBOARD ==================== */
   return (
     <div className="min-h-screen bg-[#f8f7fa] flex text-slate-800 font-sans">
-      
+
       {/* LEFT SIDEBAR NAVIGATION - Vuexy Style */}
       <aside className="hidden lg:flex w-64 bg-slate-900 text-white flex-col justify-between shrink-0 relative z-25 border-r border-slate-850 shadow-md">
-        
+
         {/* Sidebar Top Header & Logo */}
         <div className="space-y-8">
           <div className="h-20 flex items-center justify-center px-6 border-b border-slate-850 bg-slate-950/20">
@@ -399,7 +399,7 @@ export default function AdminView() {
         <div className="p-4 border-t border-slate-850 space-y-3 bg-slate-950/20">
           <div className="flex items-center gap-3 text-left">
             <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 flex items-center justify-center font-bold text-sm">
-              {username ? username.substring(0,2).toUpperCase() : 'AD'}
+              {username ? username.substring(0, 2).toUpperCase() : 'AD'}
             </div>
             <div className="leading-tight">
               <span className="text-xs font-bold text-white block truncate max-w-[130px]">{username}</span>
@@ -418,11 +418,11 @@ export default function AdminView() {
 
       {/* RIGHT MAIN WORKSPACE */}
       <div className="flex-1 min-w-0 flex flex-col justify-between min-h-screen">
-        
+
         {/* Right Header Navbar */}
         <header className="bg-white border-b border-slate-200 h-20 flex items-center z-20 px-4 sm:px-6 lg:px-8 shadow-xs">
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
-            
+
             {/* Mobile Logo Brand */}
             <div className="flex lg:hidden items-center gap-2">
               <img
@@ -450,7 +450,7 @@ export default function AdminView() {
                 <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Reload Database</span>
               </button>
-              
+
               {/* Mobile Logout trigger */}
               <button
                 onClick={handleLogout}
@@ -466,7 +466,7 @@ export default function AdminView() {
 
         {/* Content Body */}
         <main className="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-grow space-y-6">
-          
+
           {/* Welcome Dashboard Banner - Vuexy Card style */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left relative overflow-hidden">
             <div className="space-y-1.5 z-10 relative">
@@ -478,11 +478,10 @@ export default function AdminView() {
             <button
               onClick={handleExportCSV}
               disabled={filteredInquiries.length === 0}
-              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer z-10 relative ${
-                filteredInquiries.length === 0 
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-150' 
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer z-10 relative ${filteredInquiries.length === 0
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-150'
                   : 'bg-emerald-600 hover:bg-emerald-750 text-white shadow-md shadow-emerald-600/10'
-              }`}
+                }`}
             >
               <Download className="w-4 h-4" />
               <span>Export filtered CSV</span>
@@ -491,7 +490,7 @@ export default function AdminView() {
 
           {/* Metrics Dashboard Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            
+
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
                 <Layers className="w-5 h-5" />
@@ -536,14 +535,14 @@ export default function AdminView() {
 
           {/* Grid Layout: Left is list card, Right is details slide-over */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
+
             {/* Inquiries table card */}
             <div className={`bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden text-left ${selectedInquiry ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
-              
+
               {/* Table Toolbar controls */}
               <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
                 <h3 className="text-sm font-extrabold text-slate-900 block tracking-tight">Lead Submissions</h3>
-                
+
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                   {/* Search input */}
                   <div className="relative w-full sm:w-48">
@@ -593,7 +592,7 @@ export default function AdminView() {
                 <div className="py-20 text-center space-y-4 max-w-xs mx-auto text-xs text-red-500 font-semibold">
                   <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
                   <p>{errorMsg}</p>
-                  <button 
+                  <button
                     onClick={fetchInquiries}
                     className="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-colors cursor-pointer border border-slate-150"
                   >
@@ -619,12 +618,11 @@ export default function AdminView() {
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
                       {filteredInquiries.map((item) => (
-                        <tr 
+                        <tr
                           key={item.id}
                           onClick={() => handleSelectInquiry(item)}
-                          className={`hover:bg-slate-50/50 transition-all cursor-pointer ${
-                            selectedInquiry?.id === item.id ? 'bg-emerald-500/5 hover:bg-emerald-500/5' : ''
-                          }`}
+                          className={`hover:bg-slate-50/50 transition-all cursor-pointer ${selectedInquiry?.id === item.id ? 'bg-emerald-500/5 hover:bg-emerald-500/5' : ''
+                            }`}
                         >
                           <td className="py-4.5 px-6 font-bold text-slate-900 space-y-0.5">
                             <span className="block">{item.reference_id}</span>
@@ -646,13 +644,12 @@ export default function AdminView() {
                             )}
                           </td>
                           <td className="py-4.5 px-6 text-center">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-[9px] font-bold ${
-                              item.status === 'Pending' 
-                                ? 'bg-amber-50 text-amber-800 border border-amber-100' 
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-[9px] font-bold ${item.status === 'Pending'
+                                ? 'bg-amber-50 text-amber-800 border border-amber-100'
                                 : item.status === 'Contacted'
-                                ? 'bg-blue-50 text-blue-800 border border-blue-100'
-                                : 'bg-green-50 text-green-800 border border-green-100'
-                            }`}>
+                                  ? 'bg-blue-50 text-blue-800 border border-blue-100'
+                                  : 'bg-green-50 text-green-800 border border-green-100'
+                              }`}>
                               {item.status}
                             </span>
                           </td>
@@ -668,7 +665,7 @@ export default function AdminView() {
             {/* Right side Vuexy Slide-over Detail card */}
             {selectedInquiry && (
               <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-md text-left space-y-6 animate-in slide-in-from-right-4 duration-300">
-                
+
                 {/* Header with Close */}
                 <div className="flex justify-between items-start border-b border-slate-100 pb-4">
                   <div>
@@ -679,7 +676,7 @@ export default function AdminView() {
                       Ticket: {selectedInquiry.reference_id}
                     </h3>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedInquiry(null)}
                     className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
                   >
@@ -713,21 +710,21 @@ export default function AdminView() {
 
                   {/* Call redirect CTA buttons row */}
                   <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
-                    <a 
+                    <a
                       href={`tel:${selectedInquiry.phone}`}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold transition-all border border-slate-200/40"
                     >
                       <Phone className="w-3.5 h-3.5 text-slate-500" />
                       <span>Call Now</span>
                     </a>
-                    <a 
+                    <a
                       href={`mailto:${selectedInquiry.email}?subject=Kamal%20Express%20Inquiry%20${selectedInquiry.reference_id}`}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold transition-all border border-slate-200/40"
                     >
                       <Mail className="w-3.5 h-3.5 text-slate-500" />
                       <span>Send Mail</span>
                     </a>
-                    <a 
+                    <a
                       href={`https://wa.me/${selectedInquiry.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(selectedInquiry.name)},%20this%20is%20Kamal%20Express%2520regarding%252520your%25252520inquiry%2525252520${selectedInquiry.reference_id}.`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -764,7 +761,7 @@ export default function AdminView() {
 
                 {/* Edit Form status + remarks */}
                 <form onSubmit={handleUpdateInquiry} className="space-y-4 border-t border-slate-100 pt-4 text-xs text-left">
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-[10px] text-slate-400 font-bold uppercase block">
