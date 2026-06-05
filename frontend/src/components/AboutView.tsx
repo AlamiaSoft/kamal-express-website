@@ -91,7 +91,8 @@ export default function AboutView() {
         </div>
       </section>
 
-      {/* 4. Strategic Team Profiles */}
+      {/* 4. Strategic Team Profiles (Hidden for now) */}
+      {/*
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 text-center">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-semibold uppercase">
@@ -144,6 +145,7 @@ export default function AboutView() {
           </div>
         </div>
       </section>
+      */}
 
       {/* 5. Certifications & Badges */}
       <section className="bg-slate-100/60 py-16 border-y border-gray-150 text-center space-y-10">

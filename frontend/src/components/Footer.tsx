@@ -182,7 +182,7 @@ export default function Footer({ onNavigate }: FooterProps) {
       {/* Sub Footer Copyright */}
       <div className="border-t border-slate-800 bg-slate-950/60 py-6 px-4 text-slate-300">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-normal">
-          <p>© {currentYear} Kamal Express. All rights reserved. Registered DTCD License 3546/ISB.</p>
+          <p>© {currentYear} Kamal Express. All rights reserved. </p>
           <div className="flex gap-4 text-slate-300">
             <button onClick={() => handleLink('about')} className="hover:text-emerald-400 transition-colors font-medium">Our Story</button>
             <span>•</span>

@@ -92,8 +92,6 @@ if (fs.existsSync(templatePath)) {
       content: `
         <h1>About Kamal Express</h1>
         <p>With decades of experience in the travel industry, Kamal Express has established itself as Islamabad\'s leading agency for visa consulting, ticketing, and Islamic pilgrimage services.</p>
-        <h2>Our Leadership</h2>
-        <p>Led by Shariah advisors and industry veterans, our team ensures every caravan, visa file, and booking is done with the highest integrity and compliance.</p>
         <h2>Certifications & Licensing</h2>
         <ul>
           <li>Certified IATA Member Agency</li>
