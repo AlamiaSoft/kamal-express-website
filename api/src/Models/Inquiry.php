@@ -24,6 +24,7 @@ class Inquiry extends Model {
         'service_type',
         'destination',
         'notes',
+        'admin_notes',
         'status',
         'email_sent',
         'ip_address'

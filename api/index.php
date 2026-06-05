@@ -52,6 +52,11 @@ $app->add(function ($request, $handler) {
 $app->post('/inquiry', [\App\Controllers\FormController::class, 'inquiry']);
 $app->post('/contact', [\App\Controllers\FormController::class, 'contact']);
 
+// Admin CRM Routes
+$app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
+$app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
+$app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
+
 // Define default route fallback
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/', function ($request, $response) {
     $response->getBody()->write(json_encode([
