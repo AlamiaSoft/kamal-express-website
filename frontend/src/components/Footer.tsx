@@ -34,7 +34,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               Get In Touch <ArrowUpRight className="w-4 h-4" />
             </button>
             <a
-              href="https://wa.me/923000590935?text=Hi%20Kamal%20Express,%20I'm%20visiting%20your%20website%20and%20want%2520to%20know%20more%20about%20visa%20or%20tour%20options."
+              href={`https://wa.me/923000590935?text=${encodeURIComponent("Hi Kamal Express, I'm visiting your website and want to know more about visa or tour options.")}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-emerald-700 shadow-md transition-all"
