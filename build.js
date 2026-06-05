@@ -423,6 +423,16 @@ if (fs.existsSync(templatePath)) {
         <p><strong>Phone:</strong> (051) 2726807</p>
         <p><strong>Email:</strong> admin@kamalexpress.com.pk</p>
       `
+    },
+    {
+      path: 'admin',
+      title: 'CRM Staff Portal - Kamal Express',
+      description: 'Internal CRM portal for staff members to access inquiry records.',
+      keywords: 'admin, login, crm, staff portal',
+      content: `
+        <h1>CRM Staff Portal</h1>
+        <p>Authorized access only. Please authenticate using your corporate staff credentials to review client leads, edit visa booking status, and add staff notes.</p>
+      `
     }
   ];
 
@@ -436,7 +446,7 @@ if (fs.existsSync(templatePath)) {
     );
     
     // Create the meta tags snippet
-    const metaTags = `
+    let metaTags = `
     <meta name="description" content="${route.description}" />
     <meta name="keywords" content="${route.keywords || ''}" />
     <meta property="og:title" content="${route.title}" />
@@ -445,6 +455,10 @@ if (fs.existsSync(templatePath)) {
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="${route.title}" />
     <meta name="twitter:description" content="${route.description}" />`;
+
+    if (route.path === 'admin') {
+      metaTags += `\n    <meta name="robots" content="noindex, nofollow" />`;
+    }
     
     // Insert meta tags before the closing </head>
     customHtml = customHtml.replace('</head>', `${metaTags}\n  </head>`);

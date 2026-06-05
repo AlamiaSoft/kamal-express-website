@@ -13,6 +13,7 @@ import ToursView from './components/ToursView';
 import DestinationsView from './components/DestinationsView';
 import BlogView from './components/BlogView';
 import ContactView from './components/ContactView';
+import AdminView from './components/AdminView';
 
 // SEO helper
 import SEO from './components/SEO';
@@ -36,6 +37,7 @@ export default function App() {
     if (path.startsWith('/destinations')) return 'destinations';
     if (path.startsWith('/blog')) return 'blog';
     if (path.startsWith('/contact')) return 'contact';
+    if (path.startsWith('/admin')) return 'admin';
     return 'home';
   };
 
@@ -77,11 +79,13 @@ export default function App() {
     <div className="min-h-screen bg-white text-gray-800 font-sans flex flex-col justify-between selection:bg-emerald-500/20 selection:text-emerald-950">
       
       {/* Universal header navigation */}
-      <Navbar 
-        currentView={currentView} 
-        onNavigate={handleNavigate} 
-        onOpenInquiry={() => handleOpenInquiry('General Inquiry')} 
-      />
+      {currentView !== 'admin' && (
+        <Navbar 
+          currentView={currentView} 
+          onNavigate={handleNavigate} 
+          onOpenInquiry={() => handleOpenInquiry('General Inquiry')} 
+        />
+      )}
 
       {/* Main routing views */}
       <main className="flex-grow">
@@ -217,13 +221,23 @@ export default function App() {
             </>
           } />
           
+          <Route path="/admin" element={
+            <>
+              <SEO 
+                title="CRM Staff Portal - Kamal Express" 
+                description="Internal CRM portal for staff members to access inquiry records."
+              />
+              <AdminView />
+            </>
+          } />
+          
           {/* Catch-all redirect to Home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
       {/* Corporate sitemap footer block */}
-      <Footer onNavigate={handleNavigate} />
+      {currentView !== 'admin' && <Footer onNavigate={handleNavigate} />}
 
       {/* Dynamic global quick inquiry modal */}
       <InquiryModal 

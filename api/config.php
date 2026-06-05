@@ -25,3 +25,8 @@ define('SMTP_SECURE', 'ssl'); // 'ssl' for port 465
 define('ADMIN_EMAIL', 'admin@kamalexpress.com.pk');
 define('FROM_EMAIL', 'services@kamalexpress.com.pk');
 define('FROM_NAME', 'Kamal Express Services');
+
+// Admin CRM Credentials & Security Settings
+define('ADMIN_USERNAME', 'admin');
+define('ADMIN_PASSWORD_HASH', '$2y$12$YoyjGD.tEoRPWJYENjvGwODdyEGtDDrYbhSDZZBvjJ4ijIil8tAfO'); // Default password: 'kamal123'
+define('JWT_SECRET', 'kamal_express_secure_jwt_secret_key_2026_98234');

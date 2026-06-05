@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `inquiries` (
   `service_type` VARCHAR(100) NOT NULL,
   `destination` VARCHAR(100) NOT NULL,
   `notes` TEXT,
+  `admin_notes` TEXT DEFAULT NULL,
   `status` VARCHAR(50) DEFAULT 'Pending',
   `email_sent` TINYINT(1) DEFAULT 0,
   `ip_address` VARCHAR(45) DEFAULT NULL,
