@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { 
   Lock, User, LogOut, Search, Filter, Download, 
   Phone, Mail, MessageSquare, Save, X, Calendar, 
-  CheckCircle, Clock, AlertCircle, RefreshCw, Layers
+  CheckCircle, Clock, AlertCircle, RefreshCw, Layers,
+  ChevronRight, ArrowRight, Shield, Globe, Award
 } from 'lucide-react';
 
 interface InquiryItem {
@@ -233,490 +234,613 @@ export default function AdminView() {
   };
 
   if (!token) {
-    /* ==================== 1. LOGIN CONTAINER ==================== */
+    /* ==================== 1. VUEXY INSPIRED LOGIN ==================== */
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background visual accents */}
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-emerald-700/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
-
-        <div className="max-w-md w-full space-y-8 bg-slate-800/80 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-slate-700/60 shadow-xl relative z-10 text-left">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center lg:grid lg:grid-cols-12 relative overflow-hidden font-sans">
+        
+        {/* Left Side Brand Column - Vuexy Style */}
+        <div className="hidden lg:flex lg:col-span-8 bg-slate-900 min-h-screen flex-col justify-between p-12 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#076eff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
           
-          <div className="text-center space-y-3">
-            <div className="mx-auto h-12 w-12 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-600/20">
-              <Lock className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="text-2xl font-extrabold text-white">CRM Staff Portal</h2>
-            <p className="text-sm text-slate-400">Kamal Express Corporate Administration</p>
+          <div className="flex items-center gap-3 relative z-10">
+            <img
+              src="/logo.jpeg"
+              alt="Kamal Express Logo"
+              className="h-12 w-auto object-contain rounded-lg border border-slate-750 shadow-md bg-white p-1"
+            />
+            <span className="text-xl font-black tracking-tight text-white">Kamal Express</span>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-            {loginError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex gap-3 text-xs text-red-400 font-semibold leading-relaxed">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-                <span>{loginError}</span>
-              </div>
-            )}
+          <div className="space-y-6 relative z-10 max-w-xl text-left my-auto">
+            <h1 className="text-4xl xl:text-5xl font-black text-white leading-tight tracking-tight">
+              Manage Your Agency <br />
+              <span className="text-emerald-500">Leads & Caravans</span>
+            </h1>
+            <p className="text-slate-400 text-sm md:text-base leading-relaxed">
+              Welcome to the official administration CRM portal. Meticulously manage visa consultancy portfolios, air ticket flight bookings, and pilgrimage Caravan queues in real time.
+            </p>
+            <div className="flex gap-4 pt-4 text-xs font-semibold text-slate-300">
+              <span className="flex items-center gap-1.5 bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"><Shield className="w-4 h-4 text-emerald-500" /> Secure SSL</span>
+              <span className="flex items-center gap-1.5 bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"><Globe className="w-4 h-4 text-emerald-500" /> cPanel API</span>
+              <span className="flex items-center gap-1.5 bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"><Award className="w-4 h-4 text-emerald-500" /> IATA Panel</span>
+            </div>
+          </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-400 block">Username</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={loginUser}
-                    onChange={(e) => setLoginUser(e.target.value)}
-                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="Enter staff username"
-                  />
-                  <User className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                </div>
-              </div>
+          <div className="text-xs text-slate-500 relative z-10 text-left">
+            © 2026 Kamal Express. Authorized Personnel Access Only.
+          </div>
+        </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-400 block">Password</label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    required
-                    value={loginPass}
-                    onChange={(e) => setLoginPass(e.target.value)}
-                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="••••••••"
-                  />
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                </div>
-              </div>
+        {/* Right Side Login Form Column */}
+        <div className="col-span-12 lg:col-span-4 min-h-screen flex items-center justify-center p-8 bg-white relative">
+          <div className="max-w-md w-full space-y-8 text-left">
+            
+            {/* Mobile Branding Header */}
+            <div className="lg:hidden text-center space-y-4 mb-10">
+              <img
+                src="/logo.jpeg"
+                alt="Kamal Express Logo"
+                className="h-16 w-auto object-contain mx-auto rounded-xl shadow-md border border-slate-100 p-1 bg-white"
+              />
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Kamal Express CRM</h2>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-600/10 cursor-pointer flex items-center justify-center gap-2"
-            >
-              {isLoggingIn ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Authenticating...
-                </>
-              ) : (
-                'Access Dashboard'
-              )}
-            </button>
-          </form>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight hidden lg:block">Welcome to Staff Portal! 👋</h2>
+              <p className="text-slate-450 text-xs sm:text-sm font-semibold">
+                Please sign-in to your admin credentials and start monitoring active agency inquiries.
+              </p>
+            </div>
 
+            <form className="mt-8 space-y-5" onSubmit={handleLogin}>
+              {loginError && (
+                <div className="bg-red-50/70 border border-red-200/50 rounded-xl p-4 flex gap-3 text-xs text-red-650 font-semibold leading-relaxed">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-650 block">Username</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={loginUser}
+                      onChange={(e) => setLoginUser(e.target.value)}
+                      className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all bg-slate-50/50"
+                      placeholder="admin"
+                    />
+                    <User className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-650 block">Password</label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      required
+                      value={loginPass}
+                      onChange={(e) => setLoginPass(e.target.value)}
+                      className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all bg-slate-50/50"
+                      placeholder="••••••••"
+                    />
+                    <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-emerald-600/15 cursor-pointer flex items-center justify-center gap-2 text-sm"
+              >
+                {isLoggingIn ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" /> Authenticating...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+            </form>
+
+          </div>
         </div>
+
       </div>
     );
   }
 
-  /* ==================== 2. ADMIN DASHBOARD ==================== */
+  /* ==================== 2. VUEXY INSPIRED DASHBOARD ==================== */
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-emerald-500/20 selection:text-emerald-950">
+    <div className="min-h-screen bg-[#f8f7fa] flex text-slate-800 font-sans">
       
-      {/* Top Header navbar */}
-      <header className="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="bg-emerald-600 text-white font-extrabold px-3 py-1.5 rounded-lg text-sm tracking-wider shadow-sm">
-              KE CRM
-            </span>
-            <span className="text-sm font-bold tracking-tight hidden sm:inline text-slate-300">
-              Staff Portal • {username}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={fetchInquiries}
-              disabled={isLoading}
-              className="text-slate-350 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border border-slate-750"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+      {/* LEFT SIDEBAR NAVIGATION - Vuexy Style */}
+      <aside className="hidden lg:flex w-64 bg-slate-900 text-white flex-col justify-between shrink-0 relative z-25 border-r border-slate-850 shadow-md">
         
-        {/* Page Title */}
-        <div className="text-left space-y-1">
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Leads & Inquiries Board</h1>
-          <p className="text-xs text-slate-400 leading-normal">
-            Direct customer submissions from the website forms. Review client coordinates, take action, and log internal remarks.
-          </p>
+        {/* Sidebar Top Header & Logo */}
+        <div className="space-y-8">
+          <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-850 bg-slate-950/20">
+            <img
+              src="/logo.jpeg"
+              alt="Kamal Express Logo"
+              className="h-10 w-auto object-contain rounded-lg border border-slate-750 shadow-sm bg-white p-0.5"
+            />
+            <div className="text-left leading-none">
+              <span className="text-sm font-extrabold tracking-tight text-white block">Kamal Express</span>
+              <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mt-1">Admin Panel</span>
+            </div>
+          </div>
+
+          {/* Navigation Links list */}
+          <div className="px-4 space-y-1">
+            <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-600/10 cursor-pointer text-left">
+              <span className="flex items-center gap-2.5">
+                <Layers className="w-4 h-4" /> Inquiries Board
+              </span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            {/* Template links to look professional */}
+            <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
+              <span className="flex items-center gap-2.5">
+                <Globe className="w-4 h-4" /> Destination Config
+              </span>
+            </button>
+            <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
+              <span className="flex items-center gap-2.5">
+                <Calendar className="w-4 h-4" /> Umrah Caravans
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Metrics Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-          
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Total Leads</span>
-              <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700"><Layers className="w-4 h-4" /></div>
+        {/* Sidebar Bottom User session block */}
+        <div className="p-4 border-t border-slate-850 space-y-3 bg-slate-950/20">
+          <div className="flex items-center gap-3 text-left">
+            <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 flex items-center justify-center font-bold text-sm">
+              {username ? username.substring(0,2).toUpperCase() : 'AD'}
             </div>
-            <p className="text-2xl font-black text-slate-900">{totalLeads}</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Pending Tasks</span>
-              <div className="p-1.5 rounded-lg bg-amber-50 text-amber-700"><Clock className="w-4 h-4" /></div>
-            </div>
-            <p className="text-2xl font-black text-slate-900">{pendingLeads}</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">In Contact</span>
-              <div className="p-1.5 rounded-lg bg-blue-50 text-blue-700"><MessageSquare className="w-4 h-4" /></div>
-            </div>
-            <p className="text-2xl font-black text-slate-900">{contactedLeads}</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Closed Leads</span>
-              <div className="p-1.5 rounded-lg bg-green-50 text-green-700"><CheckCircle className="w-4 h-4" /></div>
-            </div>
-            <p className="text-2xl font-black text-slate-900">{closedLeads}</p>
-          </div>
-
-        </div>
-
-        {/* Filter Toolbar & Search */}
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-2xs flex flex-col md:flex-row justify-between gap-4 text-left">
-          
-          <div className="flex flex-wrap items-center gap-3 flex-grow">
-            {/* Search */}
-            <div className="relative w-full md:w-64">
-              <input
-                type="text"
-                placeholder="Search name, ref, email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-slate-50/50"
-              />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-            </div>
-
-            {/* Status Filter */}
-            <div className="relative w-full md:w-44">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-slate-50/50 appearance-none font-semibold text-slate-700 cursor-pointer"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Pending">Pending</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Closed">Closed</option>
-              </select>
-              <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
-            </div>
-
-            {/* Service Type Filter */}
-            <div className="relative w-full md:w-56">
-              <select
-                value={serviceFilter}
-                onChange={(e) => setServiceFilter(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-slate-50/50 appearance-none font-semibold text-slate-700 cursor-pointer"
-              >
-                <option value="All">All Services</option>
-                {uniqueServices.map(srv => (
-                  <option key={srv} value={srv}>{srv}</option>
-                ))}
-              </select>
-              <Filter className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+            <div className="leading-tight">
+              <span className="text-xs font-bold text-white block truncate max-w-[130px]">{username}</span>
+              <span className="text-[10px] text-slate-400 font-medium block">Staff Operations</span>
             </div>
           </div>
-
           <button
-            onClick={handleExportCSV}
-            disabled={filteredInquiries.length === 0}
-            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              filteredInquiries.length === 0 
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-150' 
-                : 'bg-slate-900 hover:bg-slate-800 text-white shadow-xs'
-            }`}
+            onClick={handleLogout}
+            className="w-full bg-slate-800 hover:bg-red-500/10 hover:text-red-400 text-slate-350 font-bold text-xs py-2.5 rounded-xl transition-all border border-slate-750 cursor-pointer flex items-center justify-center gap-1.5"
           >
-            <Download className="w-4 h-4" />
-            <span>Export to CSV</span>
+            <LogOut className="w-3.5 h-3.5" /> Sign Out
           </button>
-
         </div>
 
-        {/* Primary Workspace: Left side inquiries list, Right side details panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left panel Table Board */}
-          <div className={`bg-white border border-slate-200 rounded-2xl shadow-2xs overflow-hidden ${selectedInquiry ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+      </aside>
+
+      {/* RIGHT MAIN WORKSPACE */}
+      <div className="flex-1 min-w-0 flex flex-col justify-between min-h-screen">
+        
+        {/* Right Header Navbar */}
+        <header className="bg-white border-b border-slate-200 h-20 flex items-center z-20 px-4 sm:px-6 lg:px-8 shadow-xs">
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
             
-            {isLoading ? (
-              <div className="py-20 text-center space-y-4">
-                <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mx-auto" />
-                <p className="text-xs text-slate-400">Loading data from cPanel server...</p>
+            {/* Mobile Logo Brand */}
+            <div className="flex lg:hidden items-center gap-2">
+              <img
+                src="/logo.jpeg"
+                alt="Kamal Express Logo"
+                className="h-9 w-auto object-contain rounded-lg border border-slate-100 p-0.5 bg-white shadow-xs"
+              />
+              <span className="text-sm font-extrabold text-slate-900 tracking-tight block">Kamal Express</span>
+            </div>
+
+            {/* Breadcrumb Title */}
+            <div className="hidden lg:flex items-center gap-2 text-xs font-bold">
+              <span className="text-slate-400">Administration</span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-450" />
+              <span className="text-slate-800">Inquiries Dashboard</span>
+            </div>
+
+            {/* Quick Actions navbar tools */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={fetchInquiries}
+                disabled={isLoading}
+                className="text-slate-500 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer border border-slate-150 bg-white"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Reload Database</span>
+              </button>
+              
+              {/* Mobile Logout trigger */}
+              <button
+                onClick={handleLogout}
+                className="lg:hidden text-slate-550 hover:text-red-650 p-2 rounded-xl hover:bg-red-50 border border-slate-150 bg-white transition-colors cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+
+          </div>
+        </header>
+
+        {/* Content Body */}
+        <main className="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-grow space-y-6">
+          
+          {/* Welcome Dashboard Banner - Vuexy Card style */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left relative overflow-hidden">
+            <div className="space-y-1.5 z-10 relative">
+              <h2 className="text-xl font-extrabold text-slate-900 leading-tight">Welcome Back, {username}!</h2>
+              <p className="text-slate-450 text-xs sm:text-sm font-semibold max-w-xl leading-relaxed">
+                You have <span className="text-emerald-700 font-bold">{pendingLeads} pending inquiry tickets</span> requiring immediate coordination or VFS embassy booking actions.
+              </p>
+            </div>
+            <button
+              onClick={handleExportCSV}
+              disabled={filteredInquiries.length === 0}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer z-10 relative ${
+                filteredInquiries.length === 0 
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-150' 
+                  : 'bg-emerald-600 hover:bg-emerald-750 text-white shadow-md shadow-emerald-600/10'
+              }`}
+            >
+              <Download className="w-4 h-4" />
+              <span>Export filtered CSV</span>
+            </button>
+          </div>
+
+          {/* Metrics Dashboard Row */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
+                <Layers className="w-5 h-5" />
               </div>
-            ) : errorMsg ? (
-              <div className="py-16 text-center space-y-3 max-w-sm mx-auto text-xs text-red-500 font-semibold">
-                <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
-                <p>{errorMsg}</p>
-                <button 
-                  onClick={fetchInquiries}
-                  className="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors cursor-pointer border border-slate-150"
-                >
-                  Retry Connection
-                </button>
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Leads</span>
+                <p className="text-xl font-black text-slate-900 leading-tight">{totalLeads}</p>
               </div>
-            ) : filteredInquiries.length === 0 ? (
-              <div className="py-20 text-center space-y-3">
-                <Search className="w-10 h-10 text-slate-300 mx-auto animate-pulse" />
-                <h4 className="text-sm font-bold text-slate-800">No matching inquiries</h4>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                  Try typing different search queries or adjusting filters.
-                </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5" />
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-450 uppercase tracking-wider">
-                      <th className="py-3.5 px-5">Ref ID</th>
-                      <th className="py-3.5 px-5">Client Info</th>
-                      <th className="py-3.5 px-5">Service / Destination</th>
-                      <th className="py-3.5 px-5">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs">
-                    {filteredInquiries.map((item) => (
-                      <tr 
-                        key={item.id}
-                        onClick={() => handleSelectInquiry(item)}
-                        className={`hover:bg-slate-50/70 transition-colors cursor-pointer ${
-                          selectedInquiry?.id === item.id ? 'bg-emerald-500/5 hover:bg-emerald-500/5' : ''
-                        }`}
-                      >
-                        <td className="py-4 px-5 font-bold text-slate-900 space-y-0.5">
-                          <span>{item.reference_id}</span>
-                          <span className="text-[10px] text-slate-400 font-medium block">
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </span>
-                        </td>
-                        <td className="py-4 px-5 space-y-0.5">
-                          <span className="font-bold text-slate-850 block">{item.name}</span>
-                          <span className="text-[11px] text-slate-450 font-normal block">{item.email}</span>
-                          <span className="text-[11px] text-slate-450 font-normal block">{item.phone}</span>
-                        </td>
-                        <td className="py-4 px-5 space-y-0.5 font-medium text-slate-800">
-                          <span className="block truncate max-w-[180px]">{item.service_type}</span>
-                          {item.destination && (
-                            <span className="text-[10px] bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded block w-max mt-0.5">
-                              {item.destination}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-5">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold ${
-                            item.status === 'Pending' 
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200/50' 
-                              : item.status === 'Contacted'
-                              ? 'bg-blue-50 text-blue-700 border border-blue-200/50'
-                              : 'bg-green-50 text-green-700 border border-green-200/50'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                      </tr>
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Pending Tasks</span>
+                <p className="text-xl font-black text-slate-900 leading-tight">{pendingLeads}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shrink-0">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">In Contact</span>
+                <p className="text-xl font-black text-slate-900 leading-tight">{contactedLeads}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center justify-center shrink-0">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Closed Stays</span>
+                <p className="text-xl font-black text-slate-900 leading-tight">{closedLeads}</p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Grid Layout: Left is list card, Right is details slide-over */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Inquiries table card */}
+            <div className={`bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden text-left ${selectedInquiry ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+              
+              {/* Table Toolbar controls */}
+              <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <h3 className="text-sm font-extrabold text-slate-900 block tracking-tight">Lead Submissions</h3>
+                
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  {/* Search input */}
+                  <div className="relative w-full sm:w-48">
+                    <input
+                      type="text"
+                      placeholder="Search name, ref..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-medium"
+                    />
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                  </div>
+
+                  {/* Status Dropdown */}
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                    className="border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-semibold text-slate-700 cursor-pointer"
+                  >
+                    <option value="All">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+
+                  {/* Service Dropdown */}
+                  <select
+                    value={serviceFilter}
+                    onChange={(e) => setServiceFilter(e.target.value)}
+                    className="border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-semibold text-slate-700 cursor-pointer max-w-[120px]"
+                  >
+                    <option value="All">All Services</option>
+                    {uniqueServices.map(srv => (
+                      <option key={srv} value={srv}>{srv}</option>
                     ))}
-                  </tbody>
-                </table>
+                  </select>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              {isLoading ? (
+                <div className="py-24 text-center space-y-4">
+                  <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mx-auto" />
+                  <p className="text-xs text-slate-400">Loading records from database Capsule...</p>
+                </div>
+              ) : errorMsg ? (
+                <div className="py-20 text-center space-y-4 max-w-xs mx-auto text-xs text-red-500 font-semibold">
+                  <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
+                  <p>{errorMsg}</p>
+                  <button 
+                    onClick={fetchInquiries}
+                    className="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-colors cursor-pointer border border-slate-150"
+                  >
+                    Retry Fetching
+                  </button>
+                </div>
+              ) : filteredInquiries.length === 0 ? (
+                <div className="py-24 text-center space-y-3">
+                  <Search className="w-8 h-8 text-slate-350 mx-auto" />
+                  <h4 className="text-xs font-bold text-slate-800">No leads match filters</h4>
+                  <p className="text-[11px] text-slate-400">Try adjusting your filters or search keywords.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                        <th className="py-4 px-6">Ref ID / Date</th>
+                        <th className="py-4 px-6">Client Info</th>
+                        <th className="py-4 px-6">Service / Target</th>
+                        <th className="py-4 px-6 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs">
+                      {filteredInquiries.map((item) => (
+                        <tr 
+                          key={item.id}
+                          onClick={() => handleSelectInquiry(item)}
+                          className={`hover:bg-slate-50/50 transition-all cursor-pointer ${
+                            selectedInquiry?.id === item.id ? 'bg-emerald-500/5 hover:bg-emerald-500/5' : ''
+                          }`}
+                        >
+                          <td className="py-4.5 px-6 font-bold text-slate-900 space-y-0.5">
+                            <span className="block">{item.reference_id}</span>
+                            <span className="text-[10px] text-slate-400 font-bold block flex items-center gap-1">
+                              <Calendar className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString()}
+                            </span>
+                          </td>
+                          <td className="py-4.5 px-6 space-y-0.5 text-slate-800">
+                            <span className="font-extrabold block text-slate-900">{item.name}</span>
+                            <span className="text-[11px] text-slate-450 font-normal block">{item.email}</span>
+                            <span className="text-[11px] text-slate-450 font-normal block">{item.phone}</span>
+                          </td>
+                          <td className="py-4.5 px-6 space-y-1 font-medium text-slate-850">
+                            <span className="block truncate max-w-[150px] font-semibold">{item.service_type}</span>
+                            {item.destination && (
+                              <span className="text-[9px] bg-slate-100 text-slate-650 font-bold px-2 py-0.5 rounded-md block w-max mt-0.5">
+                                {item.destination}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4.5 px-6 text-center">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-[9px] font-bold ${
+                              item.status === 'Pending' 
+                                ? 'bg-amber-50 text-amber-800 border border-amber-100' 
+                                : item.status === 'Contacted'
+                                ? 'bg-blue-50 text-blue-800 border border-blue-100'
+                                : 'bg-green-50 text-green-800 border border-green-100'
+                            }`}>
+                              {item.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+            </div>
+
+            {/* Right side Vuexy Slide-over Detail card */}
+            {selectedInquiry && (
+              <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-md text-left space-y-6 animate-in slide-in-from-right-4 duration-300">
+                
+                {/* Header with Close */}
+                <div className="flex justify-between items-start border-b border-slate-100 pb-4">
+                  <div>
+                    <span className="text-[9px] bg-emerald-50 text-emerald-800 font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-lg block w-max mb-1.5">
+                      {selectedInquiry.status} Lead
+                    </span>
+                    <h3 className="text-base font-extrabold text-slate-950 leading-tight">
+                      Ticket: {selectedInquiry.reference_id}
+                    </h3>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedInquiry(null)}
+                    className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Meta details grids */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Name</span>
+                      <p className="font-extrabold text-slate-900">{selectedInquiry.name}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Submitted Date</span>
+                      <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        {new Date(selectedInquiry.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Email Address</span>
+                      <p className="font-semibold text-slate-800 break-all">{selectedInquiry.email}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Phone Number</span>
+                      <p className="font-semibold text-slate-800">{selectedInquiry.phone}</p>
+                    </div>
+                  </div>
+
+                  {/* Call redirect CTA buttons row */}
+                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+                    <a 
+                      href={`tel:${selectedInquiry.phone}`}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold transition-all border border-slate-200/40"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Call Now</span>
+                    </a>
+                    <a 
+                      href={`mailto:${selectedInquiry.email}?subject=Kamal%20Express%20Inquiry%20${selectedInquiry.reference_id}`}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold transition-all border border-slate-200/40"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Send Mail</span>
+                    </a>
+                    <a 
+                      href={`https://wa.me/${selectedInquiry.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(selectedInquiry.name)},%20this%20is%20Kamal%20Express%2520regarding%252520your%25252520inquiry%2525252520${selectedInquiry.reference_id}.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-emerald-850 text-[10px] font-extrabold transition-all border border-emerald-200/30"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>WhatsApp Client</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Lead Service and Original client message */}
+                <div className="space-y-4 border-t border-slate-100 pt-4 text-xs text-left">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Service Category</span>
+                      <p className="font-extrabold text-slate-900">{selectedInquiry.service_type}</p>
+                    </div>
+                    {selectedInquiry.destination && (
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Visa Country</span>
+                        <p className="font-extrabold text-slate-900">{selectedInquiry.destination}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Request Details</span>
+                    <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-150 text-slate-750 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap font-medium">
+                      {selectedInquiry.notes || 'No notes left by client.'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Form status + remarks */}
+                <form onSubmit={handleUpdateInquiry} className="space-y-4 border-t border-slate-100 pt-4 text-xs text-left">
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] text-slate-400 font-bold uppercase block">
+                        Work Status
+                      </label>
+                      <select
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value as any)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-semibold text-slate-700 cursor-pointer"
+                      >
+                        <option value="Pending">Pending Action</option>
+                        <option value="Contacted">Contacted Client</option>
+                        <option value="Closed">Closed / Resolved</option>
+                      </select>
+                    </div>
+
+                    {selectedInquiry.ip_address && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Sender IP Address</span>
+                        <p className="font-semibold text-slate-400 py-2.5">{selectedInquiry.ip_address}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase block">
+                      Internal Staff Remarks / Notes
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editAdminNotes}
+                      onChange={(e) => setEditAdminNotes(e.target.value)}
+                      placeholder="Type details of your call, passport submissions, or travel coordinates changes..."
+                      className="w-full border border-slate-200 rounded-2xl p-3.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white leading-relaxed font-semibold text-slate-750"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 text-xs"
+                  >
+                    {isSaving ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" /> Saving remarks...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" /> Save Ticket Updates
+                      </>
+                    )}
+                  </button>
+
+                </form>
+
               </div>
             )}
 
           </div>
 
-          {/* Right panel Inquiry details panel */}
-          {selectedInquiry && (
-            <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 shadow-md text-left space-y-6 animate-in slide-in-from-right-4 duration-300">
-              
-              {/* Header with Close */}
-              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                    Lead Details
-                  </span>
-                  <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
-                    {selectedInquiry.reference_id}
-                  </h3>
-                </div>
-                <button 
-                  onClick={() => setSelectedInquiry(null)}
-                  className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+        </main>
 
-              {/* Client Info Block */}
-              <div className="space-y-4">
-                
-                {/* Meta details table */}
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Name</span>
-                    <p className="font-bold text-slate-800">{selectedInquiry.name}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Submitted Date</span>
-                    <p className="font-medium text-slate-800 flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      {new Date(selectedInquiry.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Email</span>
-                    <p className="font-medium text-slate-800 break-all">{selectedInquiry.email}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Phone</span>
-                    <p className="font-medium text-slate-800">{selectedInquiry.phone}</p>
-                  </div>
-                </div>
+        {/* Footer */}
+        <footer className="bg-white border-t border-slate-200 text-slate-450 py-5 text-xs font-semibold">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between">
+            <p>© 2026 Kamal Express. All rights reserved.</p>
+            <p className="mt-1 sm:mt-0 text-slate-400">Authorized personnel operations.</p>
+          </div>
+        </footer>
 
-                {/* Quick actions line */}
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-50">
-                  <a 
-                    href={`tel:${selectedInquiry.phone}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition-all"
-                  >
-                    <Phone className="w-3 h-3 text-slate-500" />
-                    <span>Call Client</span>
-                  </a>
-                  <a 
-                    href={`mailto:${selectedInquiry.email}?subject=Kamal%20Express%20Inquiry%20${selectedInquiry.reference_id}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition-all"
-                  >
-                    <Mail className="w-3 h-3 text-slate-500" />
-                    <span>Send Email</span>
-                  </a>
-                  <a 
-                    href={`https://wa.me/${selectedInquiry.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(selectedInquiry.name)},%20this%20is%20Kamal%20Express%20regarding%20your%20inquiry%2520${selectedInquiry.reference_id}.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold transition-all border border-emerald-200/40"
-                  >
-                    <MessageSquare className="w-3 h-3 text-emerald-600" />
-                    <span>WhatsApp Chat</span>
-                  </a>
-                </div>
-
-              </div>
-
-              {/* Inquiry details */}
-              <div className="space-y-4 border-t border-slate-100 pt-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase">Requested Service</span>
-                    <p className="font-bold text-slate-800">{selectedInquiry.service_type}</p>
-                  </div>
-                  {selectedInquiry.destination && (
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Target Destination</span>
-                      <p className="font-bold text-slate-800">{selectedInquiry.destination}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Client Message / Notes</span>
-                  <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-150 text-slate-700 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap font-medium">
-                    {selectedInquiry.notes || 'No message provided.'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Edit Status & Remarks Form */}
-              <form onSubmit={handleUpdateInquiry} className="space-y-4 border-t border-slate-100 pt-4 text-xs text-left">
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] text-slate-400 font-bold uppercase block">
-                      Lead Status
-                    </label>
-                    <select
-                      value={editStatus}
-                      onChange={(e) => setEditStatus(e.target.value as any)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-semibold text-slate-700 cursor-pointer"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Contacted">Contacted</option>
-                      <option value="Closed">Closed</option>
-                    </select>
-                  </div>
-                  
-                  {selectedInquiry.ip_address && (
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">IP Address</span>
-                      <p className="font-medium text-slate-500 py-2">{selectedInquiry.ip_address}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 font-bold uppercase block">
-                    Internal Staff Remarks / Notes
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={editAdminNotes}
-                    onChange={(e) => setEditAdminNotes(e.target.value)}
-                    placeholder="Type call logs, visa slot details, or general follow-up notes here..."
-                    className="w-full border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white leading-relaxed font-semibold text-slate-700"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {isSaving ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" /> Saving Changes...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" /> Save Ticket Updates
-                    </>
-                  )}
-                </button>
-
-              </form>
-
-            </div>
-          )}
-
-        </div>
-
-      </main>
-
-      {/* Admin Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 text-slate-450 py-4 text-xs font-semibold">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between">
-          <p>© 2026 Kamal Express. All rights reserved.</p>
-          <p className="mt-1 sm:mt-0 text-slate-500">Authorized personnel access only.</p>
-        </div>
-      </footer>
+      </div>
 
     </div>
   );
