@@ -243,13 +243,12 @@ export default function AdminView() {
           <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#076eff_1px,transparent_1px)] [background-size:16px_16px]"></div>
           <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
           
-          <div className="flex items-center gap-3 relative z-10">
+          <div className="relative z-10">
             <img
               src="/logo.jpeg"
               alt="Kamal Express Logo"
               className="h-12 w-auto object-contain rounded-lg border border-slate-750 shadow-md bg-white p-1"
             />
-            <span className="text-xl font-black tracking-tight text-white">Kamal Express</span>
           </div>
 
           <div className="space-y-6 relative z-10 max-w-xl text-left my-auto">
@@ -366,16 +365,12 @@ export default function AdminView() {
         
         {/* Sidebar Top Header & Logo */}
         <div className="space-y-8">
-          <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-850 bg-slate-950/20">
+          <div className="h-20 flex items-center justify-center px-6 border-b border-slate-850 bg-slate-950/20">
             <img
               src="/logo.jpeg"
               alt="Kamal Express Logo"
               className="h-10 w-auto object-contain rounded-lg border border-slate-750 shadow-sm bg-white p-0.5"
             />
-            <div className="text-left leading-none">
-              <span className="text-sm font-extrabold tracking-tight text-white block">Kamal Express</span>
-              <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mt-1">Admin Panel</span>
-            </div>
           </div>
 
           {/* Navigation Links list */}
