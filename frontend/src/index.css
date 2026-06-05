@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Overwrite emerald scheme with #076eff brand blue */
+  --color-emerald-50: #f0f7ff;
+  --color-emerald-100: #e0f0ff;
+  --color-emerald-200: #c2e0ff;
+  --color-emerald-300: #99ccff;
+  --color-emerald-400: #54a3ff;
+  --color-emerald-500: #076eff;
+  --color-emerald-600: #076eff;
+  --color-emerald-700: #0056cc;
+  --color-emerald-750: #0047a3;
+  --color-emerald-800: #003b8a;
+  --color-emerald-850: rgb(7, 110, 255);
+  --color-emerald-900: #002352;
+  --color-emerald-950: #001129;
+  --color-emerald-990: #000c1f;
+
+  /* Custom high-contrast gold CTAs */
+  --color-gold: #FFD700;
+  --color-gold-hover: #e6c200;
+  --color-gold-dark: #b89b00;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+

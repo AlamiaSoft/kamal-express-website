@@ -1,0 +1,6 @@
+{
+  "name": "Kamal Express",
+  "description": "Travel, visa, tourism, air ticketing, hotel reservations, and custom Umrah packages tailored for your journeys.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
