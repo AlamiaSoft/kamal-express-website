@@ -688,7 +688,7 @@ export default function AdminView() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="w-full bg-emerald-650 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
                 >
                   {isSaving ? (
                     <>
