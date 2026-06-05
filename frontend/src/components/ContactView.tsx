@@ -151,7 +151,7 @@ export default function ContactView() {
                 <div className="space-y-1">
                   <span className="text-xs text-gray-400 font-bold tracking-wide uppercase">Support Email</span>
                   <p className="text-sm text-gray-700 font-semibold">
-                    info@kamalexpress.com.pk
+                    customercare@kamalexpress.com.pk
                   </p>
                 </div>
               </div>

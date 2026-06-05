@@ -29,7 +29,7 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
               <Phone className="w-3 h-3" /> (051) 2726807
             </span>
             <span className="hidden sm:inline">|</span>
-            <span className="hidden sm:inline">info@kamalexpress.com.pk</span>
+            <span className="hidden sm:inline">customercare@kamalexpress.com.pk</span>
             <span className="hidden md:inline">|</span>
             <span className="hidden md:inline">Hours: Mon-Sat 09:00 AM - 06:00 PM</span>
           </div>
@@ -66,8 +66,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('home')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'home'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               Home
@@ -77,8 +77,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('about')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'about'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               About Us
@@ -90,8 +90,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
                 onMouseEnter={() => setServicesOpen(true)}
                 onClick={() => handleNavLink('services')}
                 className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'services'
-                    ? 'text-emerald-700 bg-emerald-50/50'
-                    : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                  ? 'text-emerald-700 bg-emerald-50/50'
+                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                   }`}
               >
                 Services
@@ -148,8 +148,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('umrah')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'umrah'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               Umrah
@@ -161,8 +161,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
                 onMouseEnter={() => setToursOpen(true)}
                 onClick={() => handleNavLink('tours')}
                 className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'tours'
-                    ? 'text-emerald-700 bg-emerald-50/50'
-                    : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                  ? 'text-emerald-700 bg-emerald-50/50'
+                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                   }`}
               >
                 Tours
@@ -201,8 +201,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('destinations')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'destinations'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               Destinations
@@ -212,8 +212,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('blog')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'blog'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               Blog
@@ -223,8 +223,8 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
             <button
               onClick={() => handleNavLink('contact')}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === 'contact'
-                  ? 'text-emerald-700 bg-emerald-50/50'
-                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
+                ? 'text-emerald-700 bg-emerald-50/50'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50'
                 }`}
             >
               Contact
