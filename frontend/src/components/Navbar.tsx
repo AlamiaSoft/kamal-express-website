@@ -25,9 +25,9 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
       <div className="bg-emerald-800 text-white text-xs py-2 px-4 shadow-inner">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
+            <a href="tel:+92512726807" className="flex items-center gap-1 hover:text-emerald-300 transition-colors">
               <Phone className="w-3 h-3" /> (051) 2726807
-            </span>
+            </a>
             <span className="hidden sm:inline">|</span>
             <a href="mailto:hello@kamalexpress.com.pk" className="hidden sm:inline hover:text-emerald-300 transition-colors">
               hello@kamalexpress.com.pk
