@@ -12,7 +12,7 @@ The system uses different email accounts tailored for distinct functions:
 | :--- | :--- | :--- |
 | **SMTP User / From Address** | `services@kamalexpress.com.pk` | Used to authenticate SMTP connection and send out inquiries. |
 | **Admin Receiver** | `admin@kamalexpress.com.pk` | Receives all email notifications of new inquiries and contact forms. |
-| **Fallback Channels** | `contact@kamalexpress.com.pk`<br>`customercare@kamalexpress.com.pk`<br>`marketing@kamalexpress.com.pk` | Available for manual replies, promotional alerts, or customer support operations. |
+| **Fallback Channels** | `contact@kamalexpress.com.pk`<br>`hello@kamalexpress.com.pk`<br>`marketing@kamalexpress.com.pk` | Available for manual replies, promotional alerts, or customer support operations. |
 
 SMTP settings are defined in [api/config.php](file:///e:/ali/ali-work/Clients/15-KamalExpress/kamal-express-website/api/config.php).
 

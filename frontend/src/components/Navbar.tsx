@@ -29,7 +29,9 @@ export default function Navbar({ currentView, onNavigate, onOpenInquiry }: Navba
               <Phone className="w-3 h-3" /> (051) 2726807
             </span>
             <span className="hidden sm:inline">|</span>
-            <span className="hidden sm:inline">customercare@kamalexpress.com.pk</span>
+            <a href="mailto:hello@kamalexpress.com.pk" className="hidden sm:inline hover:text-emerald-300 transition-colors">
+              hello@kamalexpress.com.pk
+            </a>
             <span className="hidden md:inline">|</span>
             <span className="hidden md:inline">Hours: Mon-Sat 09:00 AM - 06:00 PM</span>
           </div>
