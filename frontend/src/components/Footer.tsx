@@ -162,8 +162,8 @@ export default function Footer({ onNavigate }: FooterProps) {
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-emerald-500 shrink-0" />
-                <a href="mailto:customercare@kamalexpress.com.pk" className="hover:text-emerald-400 transition-colors font-medium">
-                  customercare@kamalexpress.com.pk
+                <a href="mailto:hello@kamalexpress.com.pk" className="hover:text-emerald-400 transition-colors font-medium">
+                  hello@kamalexpress.com.pk
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
