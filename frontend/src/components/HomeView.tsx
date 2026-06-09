@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
-import { 
-  FileText, Plane, Hotel, ShieldCheck, Calendar, FileCheck, 
-  ArrowRight, Star, Award, Shield, Users, MapPin, Sparkles, HelpCircle 
+import {
+  FileText, Plane, Hotel, ShieldCheck, Calendar, FileCheck,
+  ArrowRight, Star, Award, Shield, Users, MapPin, Sparkles, HelpCircle
 } from 'lucide-react';
 import { VISA_SERVICES, DESTINATIONS, TOUR_PACKAGES } from '../data';
 import { TourPackage } from '../types';
@@ -32,53 +32,54 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
 
   return (
     <div className="space-y-20 pb-16 animate-in fade-in duration-300">
-      
+
       {/* 1. Hero Banner with Quick Inquiry Form Overlaid */}
       <section className="relative bg-slate-900 overflow-hidden min-h-[550px] lg:min-h-[620px] flex items-center">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2000&auto=format&fit=crop" 
-            alt="Travel Hero Banner" 
+          <img
+            src="/header-hero-image.webp"
+            alt="Travel Hero Banner"
             className="w-full h-full object-cover opacity-35"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Hero Left Content */}
           <div className="lg:col-span-7 text-left space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-400/30 text-emerald-300 text-xs font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" /> Your Ultimate Travel Partner
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Approved Visas, Best Airfares & <span className="text-emerald-400">Custom Tours</span>
+              Your Trusted Visa Consultant & <span className="text-emerald-400">Travel Agency</span> in Pakistan.
             </h1>
             <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
-              With decades of experience based in Islamabad’s blue area, Kamal Express is your premium gateway to visa approvals, worldwide flight booking, hotel reservations, and custom spiritual & leisure tours.
+              From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands. Let our experts handle the paperwork while you pack your bags.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <button
-                onClick={() => onNavigate('destinations')}
+                onClick={() => onNavigate('services')}
                 className="bg-emerald-600 text-white font-semibold text-sm px-6 py-3.5 rounded-lg shadow-lg hover:bg-emerald-700 transition-all cursor-pointer flex items-center gap-2"
               >
-                Explore Destinations <ArrowRight className="w-4 h-4" />
+                Explore All Services <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onNavigate('services')}
-                className="bg-slate-800 text-white border border-slate-700 font-semibold text-sm px-6 py-3.5 rounded-lg hover:bg-slate-705 transition-all cursor-pointer"
+                onClick={() => onNavigate('contact')}
+                className="bg-slate-800 text-white border border-slate-700 font-semibold text-sm px-6 py-3.5 rounded-lg hover:bg-slate-700 transition-all cursor-pointer"
               >
-                Our Services
+                Contact Us
               </button>
             </div>
+
           </div>
 
           {/* Quick Inquiry Form Block Overlay (Right) */}
-          <div className="lg:col-span-5 bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-100 text-left w-full h-full">
+          <div className="lg:col-span-5 bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-150/80 text-left w-full h-full">
             <h2 className="text-lg font-bold text-gray-950">Quick Travel Plan Inquiry</h2>
             <p className="text-xs text-gray-500 mt-1 mb-6">Let Pakistan’s top certified travel consultants reach back to you instantly.</p>
-            
+
             <form onSubmit={handleHeroInquiry} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-gray-700 uppercase">Select Service</label>
@@ -134,8 +135,8 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
           {VISA_SERVICES.map((s) => {
             const IconComp = iconMap[s.iconName] || FileText;
             return (
-              <div 
-                key={s.id} 
+              <div
+                key={s.id}
                 className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-emerald-100 shadow-xs hover:shadow-lg transition-all group flex flex-col justify-between"
               >
                 <div>
@@ -160,7 +161,7 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
       {/* 3. Featured Visa Destinations (UAE, Saudi, Turkey, UK, Europe, Canada etc) */}
       <section className="bg-slate-50 py-16 text-center space-y-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          
+
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 text-left">
             <div className="space-y-2">
               <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Featured Visa Consultancies</h2>
@@ -176,16 +177,16 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             {DESTINATIONS.slice(0, 4).map((d) => (
-              <div 
+              <div
                 key={d.id}
                 className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between"
                 onClick={() => onNavigate('destinations', { slug: d.slug })}
               >
                 <div>
                   <div className="relative h-44 overflow-hidden bg-slate-100">
-                    <img 
-                      src={d.image} 
-                      alt={d.name} 
+                    <img
+                      src={d.image}
+                      alt={d.name}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-3 left-3 bg-white/95 rounded-md px-2.5 py-1 text-[10px] font-bold text-gray-800 tracking-wide uppercase shadow-xs">
@@ -234,15 +235,15 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {TOUR_PACKAGES.slice(0, 3).map((pkg: TourPackage) => (
-            <div 
+            <div
               key={pkg.id}
               className="bg-white rounded-2xl overflow-hidden border border-gray-150/80 hover:border-emerald-100 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="relative h-48 overflow-hidden bg-slate-100">
-                  <img 
-                    src={pkg.image} 
-                    alt={pkg.title} 
+                  <img
+                    src={pkg.image}
+                    alt={pkg.title}
                     className="w-full h-full object-cover hover:scale-102 transition-transform duration-250"
                   />
                   <div className="absolute top-3 left-3 bg-emerald-600 text-white rounded-md px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-xs">
@@ -252,11 +253,11 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
                     {pkg.duration}
                   </div>
                 </div>
-                
+
                 <div className="p-5 space-y-3">
                   <h3 className="text-lg font-bold text-gray-950 leading-snug">{pkg.title}</h3>
                   <p className="text-xs text-gray-500 line-clamp-2">{pkg.description}</p>
-                  
+
                   <div className="pt-2">
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1.5">Highlights Include:</span>
                     <ul className="space-y-1">
@@ -293,7 +294,7 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
       {/* 5. Why Choose Kamal Express */}
       <section className="bg-slate-900 text-white py-20 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          
+
           <div className="max-w-3xl mx-auto space-y-3">
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Why Travelers Choose Kamal Express</h2>
             <p className="text-slate-400 text-sm md:text-base">

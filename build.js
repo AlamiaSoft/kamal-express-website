@@ -69,15 +69,16 @@ if (fs.existsSync(templatePath)) {
     {
       path: '', // Home
       title: 'Kamal Express - Approved Visas, Lowest Fares & Custom Tours',
-      description: 'Kamal Express is Pakistan\'s premium visa consulting, air ticketing, hotel booking, and pilgrimage Umrah caravan service agency in Islamabad Blue Area.',
+      description: 'Your Trusted Visa Consultant & Travel Agency in Pakistan. From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands.',
       keywords: 'visa consultancy Islamabad, travel agency Blue Area, Umrah packages Pakistan, discount flights Islamabad',
       content: `
         <h1>Kamal Express - Travel & Visa Consultants</h1>
-        <p>Welcome to Kamal Express, a certified IATA and Ministry-licensed travel agency offering premium visa consultancy, cheap airfares, hotel booking, and custom Umrah caravans.</p>
+        <p>From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands. Let our experts handle the paperwork while you pack your bags.</p>
         <h2>Our Core Offerings</h2>
         <ul>
-          <li><strong>Visa Consultancy:</strong> Expert documentation review and submission file preparation for UK, USA, Schengen, Canada, and Turkey.</li>
-          <li><strong>Air Ticketing:</strong> Lowest rates on domestic and international flights.</li>
+          <li><strong>Visa Consultancy:</strong> Navigate international travel with confidence through our expert visa consultancy in Pakistan. We minimize rejection risks with document pre-screening.</li>
+          <li><strong>Air Ticketing:</strong> Secure the best travel deals with our comprehensive air ticketing services. We leverage our global partnerships to provide competitive fares.</li>
+          <li><strong>Hotel Reservations:</strong> Experience stress-free stays with our premium hotel booking services in Pakistan and beyond.</li>
           <li><strong>Umrah Caravans:</strong> Group and custom family packages under Shariah guide supervision.</li>
           <li><strong>Holiday Tours:</strong> Customized local and international itineraries with premium transport.</li>
         </ul>
@@ -122,31 +123,31 @@ if (fs.existsSync(templatePath)) {
     {
       path: 'services/visa-consultancy',
       title: 'Visa Consultancy & Documentation Services | Kamal Express',
-      description: 'Professional visa consulting for UK, USA, Schengen, Canada, Turkey, and UAE. Get bank statement pre-checks and checklist preparation.',
+      description: 'Navigate international travel with confidence through our expert visa consultancy in Pakistan. We minimize rejection risks with document pre-screening.',
       keywords: 'visa consultancy Islamabad, Schengen visa support, UK visitor visa help',
       content: `
         <h1>Visa Consultancy Services</h1>
-        <p>Our expert advisors specialize in high-contrast visa filing dossiers for popular destinations. We offer meticulous audits of bank statements, assets documentation, and embassy forms.</p>
+        <p>Navigate international travel with confidence through our expert visa consultancy in Pakistan. At Kamal Express & Holidays, we minimize rejection risks with our rigorous document pre-screening and professional visa assistance. Whether for business or tourism, our experts streamline your path to approval. Get your customized visa consultation today.</p>
       `
     },
     {
       path: 'services/air-ticketing',
       title: 'Worldwide Air Ticketing & Cheap Flights | Kamal Express',
-      description: 'Book discount air tickets with major domestic and international airlines. Real-time availability, date change, and cancellation support.',
+      description: 'Secure the best travel deals with our comprehensive air ticketing services in Pakistan. Enjoy a smooth, reliable booking experience.',
       keywords: 'cheap flights Islamabad, international airline tickets, IATA booking agency',
       content: `
         <h1>Worldwide Air Ticketing</h1>
-        <p>As IATA certified ticketing partners, we offer direct access to low fares, flexible date swaps, multi-stop routes, and group discounts for corporate entities.</p>
+        <p>Secure the best travel deals with our comprehensive air ticketing services in Pakistan. At Kamal Express & Holidays, we leverage our global partnerships to provide competitive fares on international and domestic flights. Enjoy a smooth, reliable booking experience tailored exactly to your itinerary requirements. Book Your Flights Today.</p>
       `
     },
     {
       path: 'services/hotel-reservations',
       title: 'International Hotel Bookings & Lodging | Kamal Express',
-      description: 'Secure budget-friendly and premium hotel reservations worldwide. VFS/Embassy confirmed vouchers and instant confirmation.',
+      description: 'Experience stress-free stays with our premium hotel booking services in Pakistan and beyond. Luxury and budget accommodations at the best rates.',
       keywords: 'hotel booking Islamabad, travel vouchers, premium hotel reservations',
       content: `
         <h1>Hotel Booking Services</h1>
-        <p>We provide confirmed, embassy-recognized hotel reservations and lodging vouchers worldwide. Select from 3-star budget to luxury 5-star properties.</p>
+        <p>Experience stress-free stays with our premium hotel booking services in Pakistan and beyond. At Kamal Express & Holidays, we curate a selection of luxury and budget accommodations to ensure your comfort is our priority. From international hotel reservations to boutique local stays, we guarantee the best rates for your journey. Find Your Perfect Stay.</p>
       `
     },
     {
