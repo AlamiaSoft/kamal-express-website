@@ -3,7 +3,7 @@ import {
   Lock, User, LogOut, Search, Filter, Download,
   Phone, Mail, MessageSquare, Save, X, Calendar,
   CheckCircle, Clock, AlertCircle, RefreshCw, Layers,
-  ChevronRight, ArrowRight, Shield, Globe, Award
+  ChevronRight, ArrowRight, Shield, Globe, Award, Menu
 } from 'lucide-react';
 
 interface InquiryItem {
@@ -22,6 +22,9 @@ interface InquiryItem {
 }
 
 export default function AdminView() {
+  // Mobile menu open state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Authentication states
   const [token, setToken] = useState<string | null>(sessionStorage.getItem('ke_admin_token'));
   const [username, setUsername] = useState<string>(sessionStorage.getItem('ke_admin_user') || '');
@@ -358,7 +361,87 @@ export default function AdminView() {
 
   /* ==================== 2. VUEXY INSPIRED DASHBOARD ==================== */
   return (
-    <div className="min-h-screen bg-[#f8f7fa] flex text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#f8f7fa] flex text-slate-800 font-sans relative">
+
+      {/* MOBILE SIDEBAR NAVIGATION DRAWER OVERLAY */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Drawer Panel */}
+          <aside className="relative flex w-64 max-w-xs bg-slate-900 text-white flex-col justify-between shrink-0 h-full shadow-2xl transition-all duration-300 ease-in-out">
+            
+            {/* Drawer Top Header & Logo */}
+            <div className="space-y-8">
+              <div className="h-20 flex items-center justify-between px-6 border-b border-slate-850 bg-slate-950/20">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/logo.jpeg"
+                    alt="Kamal Express Logo"
+                    className="h-9 w-auto object-contain rounded-lg border border-slate-750 shadow-sm bg-white p-0.5"
+                  />
+                  <span className="text-xs font-black tracking-tight text-white">Kamal Express</span>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links list */}
+              <div className="px-4 space-y-1">
+                <button 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-600/10 cursor-pointer text-left"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Layers className="w-4 h-4" /> Inquiries Board
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+                <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
+                  <span className="flex items-center gap-2.5">
+                    <Globe className="w-4 h-4" /> Destination Config
+                  </span>
+                </button>
+                <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
+                  <span className="flex items-center gap-2.5">
+                    <Calendar className="w-4 h-4" /> Umrah Caravans
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Sidebar Bottom User session block */}
+            <div className="p-4 border-t border-slate-850 space-y-3 bg-slate-950/20">
+              <div className="flex items-center gap-3 text-left">
+                <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 flex items-center justify-center font-bold text-sm">
+                  {username ? username.substring(0, 2).toUpperCase() : 'AD'}
+                </div>
+                <div className="leading-tight">
+                  <span className="text-xs font-bold text-white block truncate max-w-[130px]">{username}</span>
+                  <span className="text-[10px] text-slate-400 font-medium block">Staff Operations</span>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full bg-slate-800 hover:bg-red-500/10 hover:text-red-400 text-slate-350 font-bold text-xs py-2.5 rounded-xl transition-all border border-slate-750 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" /> Sign Out
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
 
       {/* LEFT SIDEBAR NAVIGATION - Vuexy Style */}
       <aside className="hidden lg:flex w-64 bg-slate-900 text-white flex-col justify-between shrink-0 relative z-25 border-r border-slate-850 shadow-md">
@@ -425,6 +508,13 @@ export default function AdminView() {
 
             {/* Mobile Logo Brand */}
             <div className="flex lg:hidden items-center gap-2">
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 rounded-xl text-slate-650 hover:bg-slate-50 border border-slate-150 transition-colors mr-1 cursor-pointer"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
               <img
                 src="/logo.jpeg"
                 alt="Kamal Express Logo"
