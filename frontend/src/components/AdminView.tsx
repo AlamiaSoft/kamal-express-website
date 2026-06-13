@@ -122,7 +122,7 @@ export default function AdminView() {
   const [saleTotalAmount, setSaleTotalAmount] = useState('');
   const [saleReceivedAmount, setSaleReceivedAmount] = useState('');
   const [saleRemainingAmount, setSaleRemainingAmount] = useState('');
-  const [saleCollectorsName, setSaleCollectorsName] = useState('');
+  const [saleCollectorsName, setSaleCollectorsName] = useState(sessionStorage.getItem('ke_admin_fullname') || sessionStorage.getItem('ke_admin_user') || '');
   const [isSavingSale, setIsSavingSale] = useState(false);
   const [saleSuccessMsg, setSaleSuccessMsg] = useState('');
   const [saleErrorMsg, setSaleErrorMsg] = useState('');
@@ -134,6 +134,15 @@ export default function AdminView() {
     const remaining = Math.max(0, total - received);
     setSaleRemainingAmount(remaining.toString());
   }, [saleTotalAmount, saleReceivedAmount]);
+
+  // Sync collector's name with current logged-in user name
+  useEffect(() => {
+    if (fullName) {
+      setSaleCollectorsName(fullName);
+    } else if (username) {
+      setSaleCollectorsName(username);
+    }
+  }, [fullName, username]);
 
   // Load appropriate lists depending on token and active tab
   useEffect(() => {
@@ -346,7 +355,7 @@ export default function AdminView() {
       setSaleTotalAmount('');
       setSaleReceivedAmount('');
       setSaleRemainingAmount('');
-      setSaleCollectorsName('');
+      setSaleCollectorsName(fullName || username);
     } catch (err: any) {
       setSaleErrorMsg(err.message || 'An error occurred.');
     } finally {
