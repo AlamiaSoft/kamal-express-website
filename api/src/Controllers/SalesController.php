@@ -26,7 +26,7 @@ class SalesController {
 
         // Validate required fields
         $required = [
-            'fullName', 'date', 'serialNumber', 'services', 'vendorName',
+            'fullName', 'date', 'services', 'vendorName',
             'country', 'sector', 'totalAmount', 'receivedAmount', 'remainingAmount', 'collectorsName'
         ];
         
@@ -52,6 +52,27 @@ class SalesController {
         // Format Date to YYYY-MM-DD
         $formattedDate = date('Y-m-d', strtotime($data['date']));
 
+        // Auto-generate incrementing Serial Number in SF-YYMMDD-XXXX format resetting daily
+        try {
+            $datePrefix = date('ymd', strtotime($data['date']));
+            $lastTransaction = SalesTransaction::where('date', $formattedDate)
+                ->where('serial_number', 'LIKE', "SF-{$datePrefix}-%")
+                ->orderByRaw('CAST(SUBSTRING_INDEX(serial_number, "-", -1) AS UNSIGNED) DESC')
+                ->first();
+
+            if ($lastTransaction) {
+                $parts = explode('-', $lastTransaction->serial_number);
+                $lastNum = (int)end($parts);
+                $nextNum = $lastNum + 1;
+            } else {
+                $nextNum = 1;
+            }
+            $serialNumber = sprintf("SF-%s-%04d", $datePrefix, $nextNum);
+        } catch (\Exception $e) {
+            // Fallback to daily-random structure if query fails
+            $serialNumber = "SF-" . date('ymd') . "-" . rand(1000, 9999);
+        }
+
         // Get IP Address
         $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
@@ -65,7 +86,7 @@ class SalesController {
                 'reference_id'     => $referenceId,
                 'full_name'        => htmlspecialchars(trim($data['fullName'])),
                 'date'             => $formattedDate,
-                'serial_number'    => htmlspecialchars(trim($data['serialNumber'])),
+                'serial_number'    => $serialNumber,
                 'services'         => $data['services'], // automatically cast to json text by Eloquent
                 'vendor_name'      => htmlspecialchars(trim($data['vendorName'])),
                 'country'          => htmlspecialchars(trim($data['country'])),

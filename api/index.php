@@ -62,6 +62,9 @@ $app->setBasePath('/api');
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 
+// Add error middleware
+$app->addErrorMiddleware(true, true, true);
+
 // 4. CORS Setup for dynamic requests
 $app->options('/{routes:.+}', function ($request, $response) {
     return $response;

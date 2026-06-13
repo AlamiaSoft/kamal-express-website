@@ -1260,14 +1260,14 @@ export default function AdminView() {
 
                   {/* Serial Number */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-650 uppercase tracking-wider block">Serial Number <span className="text-red-500">*</span></label>
+                    <label className="text-[10px] font-bold text-slate-650 uppercase tracking-wider block">Serial Number</label>
                     <input
                       type="text"
-                      required
-                      placeholder="e.g. SN-98234-A"
+                      disabled
+                      readOnly
+                      placeholder="Auto-generated (SF-YYMMDD-XXXX)"
                       value={saleSerialNumber}
-                      onChange={(e) => setSaleSerialNumber(e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all bg-slate-50/30"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs bg-slate-100 font-bold text-slate-700 cursor-not-allowed"
                     />
                   </div>
 
