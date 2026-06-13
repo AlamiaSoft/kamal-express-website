@@ -132,6 +132,59 @@ $app->put('/admin/sales/{id}', [\App\Controllers\SalesController::class, 'update
 $app->get('/sales/approve/{token}', [\App\Controllers\SalesController::class, 'approveViaEmail']);
 $app->get('/sales/reject/{token}', [\App\Controllers\SalesController::class, 'rejectViaEmail']);
 
+// Diagnostics Route (Secure)
+$app->get('/diagnose', function ($request, $response) {
+    $queryParams = $request->getQueryParams();
+    $secret = isset($queryParams['secret']) ? $queryParams['secret'] : '';
+    if ($secret !== 'kamal_secure_diagnose_2026') {
+        $response->getBody()->write(json_encode(['error' => 'Unauthorized access.']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+    }
+
+    $results = [];
+    
+    // 1. Test database connection
+    try {
+        $pdo = Capsule::connection()->getPdo();
+        $results['db_connection'] = 'SUCCESS';
+    } catch (\Exception $e) {
+        $results['db_connection'] = 'FAILED: ' . $e->getMessage();
+        $response->getBody()->write(json_encode($results));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+    
+    // 2. Test tables
+    $tables = ['inquiries', 'sales_transactions', 'users'];
+    foreach ($tables as $table) {
+        try {
+            $exists = Capsule::schema()->hasTable($table);
+            $results['tables'][$table]['exists'] = $exists;
+            if ($exists) {
+                $columns = Capsule::schema()->getColumnListing($table);
+                $results['tables'][$table]['columns'] = $columns;
+                
+                $count = Capsule::table($table)->count();
+                $results['tables'][$table]['count'] = $count;
+            }
+        } catch (\Exception $e) {
+            $results['tables'][$table]['error'] = $e->getMessage();
+        }
+    }
+    
+    // 3. Test User admin status
+    try {
+        if ($results['tables']['users']['exists'] ?? false) {
+            $adminExists = Capsule::table('users')->where('role', 'Admin')->exists();
+            $results['admin_user_exists'] = $adminExists;
+        }
+    } catch (\Exception $e) {
+        $results['admin_check_error'] = $e->getMessage();
+    }
+    
+    $response->getBody()->write(json_encode($results, JSON_PRETTY_PRINT));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 // Define default route fallback
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/', function ($request, $response) {
     $response->getBody()->write(json_encode([
