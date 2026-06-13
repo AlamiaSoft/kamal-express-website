@@ -625,7 +625,7 @@ export default function AdminView() {
     if (filteredSales.length === 0) return;
 
     const headers = [
-      'Reference ID', 'Date', 'Staff Name', 'Serial Number', 'Services', 
+      'Reference ID', 'Date', 'Client Name', 'Serial Number', 'Services', 
       'Vendor Name', 'Country', 'Sector', 'Total Amount', 'Received Amount', 
       'Remaining Amount', 'Collector Name', 'Status', 'IP Address'
     ];
