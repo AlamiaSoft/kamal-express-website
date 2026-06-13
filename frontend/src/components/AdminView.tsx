@@ -160,6 +160,43 @@ export default function AdminView() {
     }
   }, [token, activeTab]);
 
+  // Dynamically inject manifest and register service worker on admin dashboard mount
+  useEffect(() => {
+    // 1. Inject manifest.json link tag
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = '/manifest.json';
+    manifestLink.id = 'pwa-manifest';
+    document.head.appendChild(manifestLink);
+
+    // 2. Inject apple-touch-icon link tag
+    const appleIconLink = document.createElement('link');
+    appleIconLink.rel = 'apple-touch-icon';
+    appleIconLink.href = '/icons/icon-192x192.png';
+    appleIconLink.id = 'pwa-apple-icon';
+    document.head.appendChild(appleIconLink);
+
+    // 3. Register service worker scoped to /admin
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/admin' })
+        .then(reg => {
+          console.log('CRM PWA Service Worker registered successfully for scope:', reg.scope);
+        })
+        .catch(err => {
+          console.error('CRM PWA Service Worker registration failed:', err);
+        });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      const existingManifest = document.getElementById('pwa-manifest');
+      if (existingManifest) existingManifest.remove();
+
+      const existingAppleIcon = document.getElementById('pwa-apple-icon');
+      if (existingAppleIcon) existingAppleIcon.remove();
+    };
+  }, []);
+
   const fetchUsers = async () => {
     setIsUsersLoading(true);
     setUsersErrorMsg('');
