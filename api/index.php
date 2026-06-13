@@ -52,6 +52,36 @@ try {
     error_log("Eloquent Schema Migration Error: " . $e->getMessage());
 }
 
+// Auto-migration for users table and default user seeding if not exists
+try {
+    if (!Capsule::schema()->hasTable('users')) {
+        Capsule::schema()->create('users', function ($table) {
+            $table->id();
+            $table->string('username', 50)->unique();
+            $table->string('password_hash', 255);
+            $table->string('full_name', 100);
+            $table->string('email', 100)->unique();
+            $table->string('role', 50)->default('Staff'); // 'Admin', 'Staff', 'Viewer'
+            $table->string('status', 50)->default('Active'); // 'Active', 'Suspended'
+            $table->timestamps();
+        });
+
+        // Seed the default Admin user using config credentials
+        Capsule::table('users')->insert([
+            'username'      => ADMIN_USERNAME,
+            'password_hash' => ADMIN_PASSWORD_HASH,
+            'full_name'     => 'System Administrator',
+            'email'         => ADMIN_EMAIL,
+            'role'          => 'Admin',
+            'status'        => 'Active',
+            'created_at'    => date('Y-m-d H:i:s'),
+            'updated_at'    => date('Y-m-d H:i:s')
+        ]);
+    }
+} catch (\Exception $e) {
+    error_log("Users Schema Migration/Seeding Error: " . $e->getMessage());
+}
+
 // 3. Initialize Slim App
 $app = AppFactory::create();
 
@@ -86,6 +116,12 @@ $app->post('/contact', [\App\Controllers\FormController::class, 'contact']);
 $app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
 $app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
 $app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
+
+// Admin Users & Roles Routes
+$app->get('/admin/users', [\App\Controllers\UserController::class, 'getUsers']);
+$app->post('/admin/users', [\App\Controllers\UserController::class, 'createUser']);
+$app->put('/admin/users/{id}', [\App\Controllers\UserController::class, 'updateUser']);
+$app->delete('/admin/users/{id}', [\App\Controllers\UserController::class, 'deleteUser']);
 
 // Admin Sales Routes
 $app->post('/admin/sales', [\App\Controllers\SalesController::class, 'recordSale']);

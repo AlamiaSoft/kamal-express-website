@@ -442,6 +442,12 @@ class SalesController {
             return false; // Token expired
         }
 
+        // Verify user exists and is active in database
+        $user = \App\Models\User::where('username', $payload['user'] ?? '')->first();
+        if (!$user || $user->status !== 'Active') {
+            return false;
+        }
+
         return true;
     }
 }

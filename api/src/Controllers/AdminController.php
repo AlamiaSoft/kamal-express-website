@@ -4,6 +4,7 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\Inquiry;
+use App\Models\User;
 
 class AdminController {
     
@@ -15,11 +16,23 @@ class AdminController {
         $username = isset($body['username']) ? trim($body['username']) : '';
         $password = isset($body['password']) ? trim($body['password']) : '';
         
-        if ($username === ADMIN_USERNAME && password_verify($password, ADMIN_PASSWORD_HASH)) {
+        $user = User::where('username', $username)->first();
+        
+        if ($user && $user->status === 'Suspended') {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Your account is suspended. Please contact the administrator.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+        }
+
+        if ($user && $user->status === 'Active' && password_verify($password, $user->password_hash)) {
             // Generate a stateless securely signed token (JWT style)
             $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
             $payload = base64_encode(json_encode([
                 'user' => $username,
+                'name' => $user->full_name,
+                'role' => $user->role,
                 'exp' => time() + 86400 // Valid for 24 hours
             ]));
             
@@ -35,7 +48,9 @@ class AdminController {
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'token' => $token,
-                'username' => $username
+                'username' => $username,
+                'role' => $user->role,
+                'fullName' => $user->full_name
             ]));
             return $response->withHeader('Content-Type', 'application/json');
         }
@@ -161,6 +176,12 @@ class AdminController {
         
         if (!isset($payload['exp']) || time() > $payload['exp']) {
             return false; // Token expired
+        }
+
+        // Verify user exists and is active in database
+        $user = User::where('username', $payload['user'] ?? '')->first();
+        if (!$user || $user->status !== 'Active') {
+            return false;
         }
         
         return true;
