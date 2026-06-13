@@ -822,23 +822,68 @@ export default function AdminView() {
 
               {/* Navigation Links list */}
               <div className="px-4 space-y-1">
-                <button 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-600/10 cursor-pointer text-left"
+                <button
+                  onClick={() => { setActiveTab('inquiries'); setSelectedInquiry(null); setSelectedSale(null); setIsMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                    activeTab === 'inquiries'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                  }`}
                 >
                   <span className="flex items-center gap-2.5">
                     <Layers className="w-4 h-4" /> Inquiries Board
                   </span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
+
+                <button
+                  onClick={() => { setActiveTab('record-sale'); setSelectedInquiry(null); setSelectedSale(null); setIsMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                    activeTab === 'record-sale'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <PlusCircle className="w-4 h-4" /> Record Sale Form
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('sales-records'); setSelectedInquiry(null); setSelectedSale(null); setIsMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                    activeTab === 'sales-records'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4" /> Sales Records
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                {role === 'Admin' && (
+                  <button
+                    onClick={() => { setActiveTab('users'); setSelectedInquiry(null); setSelectedSale(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                      activeTab === 'users'
+                        ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <Users className="w-4 h-4" /> Users & Roles
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* Template links to look professional */}
                 <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
                   <span className="flex items-center gap-2.5">
                     <Globe className="w-4 h-4" /> Destination Config
-                  </span>
-                </button>
-                <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
-                  <span className="flex items-center gap-2.5">
-                    <Calendar className="w-4 h-4" /> Umrah Caravans
                   </span>
                 </button>
               </div>
