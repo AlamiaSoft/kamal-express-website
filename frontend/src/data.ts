@@ -4,38 +4,41 @@ export const VISA_SERVICES: VisaService[] = [
   {
     id: 'visa-consultancy',
     title: 'Visa Consultancy',
-    description: 'Expert guidance for tourist, business, study, and family join visas. We assist with complete application reviews and profile building.',
+    description: 'Navigate international travel with confidence through our expert visa consultancy in Pakistan. At Kamal Express & Holidays, we minimize rejection risks with our rigorous document pre-screening and professional visa assistance. Whether for business or tourism, our experts streamline your path to approval.',
     features: [
-      'Personalized document checklists according to your profile',
-      'Step-by-step guidance on application forms',
-      'Detailed file review to maximize approval success',
-      'Cover letter and travel itinerary planning'
+      'Expert Visa Eligibility Assessment in Pakistan',
+      'Professional Visa Document Pre-Screening Services',
+      'End-to-End Visa Application Management',
+      'Specialized Visa Interview Preparation & Coaching'
     ],
-    iconName: 'FileText'
+    iconName: 'FileText',
+    ctaText: 'Get your customized visa consultation today.'
   },
   {
     id: 'air-ticketing',
     title: 'Air Ticketing',
-    description: 'Fast, reliable, and economical domestic and international flight bookings across major airlines with special corporate discounts.',
+    description: 'Secure the best travel deals with our comprehensive air ticketing services in Pakistan. At Kamal Express & Holidays, we leverage our global partnerships to provide competitive fares on international and domestic flights. Enjoy a smooth, reliable booking experience tailored exactly to your itinerary requirements.',
     features: [
-      'Real-time access to major global alliances (Star Alliance, SkyTeam, Oneworld)',
-      'Flexible flight modifications and cancellation support',
-      'Add-on management (luggage, pre-booked seats, special meals)',
-      'Corporate and group travel special fares'
+      'Competitive International Flight Booking',
+      'Affordable Domestic Air Ticketing Solutions',
+      'Real-Time Flight Schedule & Price Alerts',
+      'Seamless Group & Corporate Travel Ticketing'
     ],
-    iconName: 'Plane'
+    iconName: 'Plane',
+    ctaText: 'Book Your Flights Today'
   },
   {
     id: 'hotel-reservations',
     title: 'Hotel Reservations',
-    description: 'Instant booking for hundreds of verified accommodations globally. We match your style, budget, and proximity requirements.',
+    description: 'Experience stress-free stays with our premium hotel booking services in Pakistan and beyond. At Kamal Express & Holidays, we curate a selection of luxury and budget accommodations to ensure your comfort is our priority. From international hotel reservations to boutique local stays, we guarantee the best rates for your journey.',
     features: [
-      'Partnerships with top tier resort chains and budget-friendly boutique stays',
-      'Secure payment models and free cancellations on select properties',
-      'Corporate bulk and wholesale discounted rates',
-      'Dedicated concierge support for special room layouts'
+      'Best Hotel Deals & Competitive Rates',
+      'Global Luxury & Budget Hotel Reservations',
+      'Verified Accommodation & Trusted Stays',
+      'Customized Hotel Packages for Business & Leisure'
     ],
-    iconName: 'Hotel'
+    iconName: 'Hotel',
+    ctaText: 'Find Your Perfect Stay'
   },
   {
     id: 'travel-insurance',

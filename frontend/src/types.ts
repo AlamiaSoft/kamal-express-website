@@ -4,6 +4,7 @@ export interface VisaService {
   description: string;
   features: string[];
   iconName: string;
+  ctaText?: string;
 }
 
 export interface TourPackage {

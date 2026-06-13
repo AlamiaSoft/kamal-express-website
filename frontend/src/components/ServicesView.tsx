@@ -160,7 +160,7 @@ export default function ServicesView({ initialServiceId, onOpenInquiry }: Servic
               onClick={() => onOpenInquiry(activeService.title)}
               className="bg-gold hover:bg-gold-hover text-slate-950 font-bold text-sm px-6 py-3 rounded-lg shadow-md transition-colors cursor-pointer shrink-0"
             >
-              Inquire Now
+              {activeService.ctaText || 'Inquire Now'}
             </button>
           </div>
 
