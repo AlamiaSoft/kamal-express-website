@@ -15,14 +15,48 @@ interface DestinationsViewProps {
 export default function DestinationsView({ initialSlug, onOpenInquiry }: DestinationsViewProps) {
   const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
+  const [destinationsList, setDestinationsList] = useState<Destination[]>(DESTINATIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
+
+  // Fetch destinations from API with fallback to static DESTINATIONS
+  useEffect(() => {
+    fetch('/api/public/destinations')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch destinations');
+        return res.json();
+      })
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: Destination[] = data.map(d => ({
+            id: d.id,
+            name: d.name,
+            slug: d.slug,
+            image: d.image || '',
+            visaType: d.visa_type || d.visaType || '',
+            processingTime: d.processing_time || d.processingTime || '',
+            stayDuration: d.stay_duration || d.stayDuration || '',
+            validity: d.validity || '',
+            price: d.price || '',
+            requiredDocuments: Array.isArray(d.required_documents) ? d.required_documents : (Array.isArray(d.requiredDocuments) ? d.requiredDocuments : []),
+            faqs: Array.isArray(d.faqs) ? d.faqs : []
+          }));
+          setDestinationsList(mapped);
+        } else {
+          setDestinationsList(DESTINATIONS);
+        }
+      })
+      .catch(err => {
+        console.warn("Failed to fetch dynamic destinations, falling back to static DESTINATIONS:", err);
+        setDestinationsList(DESTINATIONS);
+      });
+  }, []);
 
   // Focus a specific destination if slug passed (from homepage clicks or footer links)
   useEffect(() => {
     const targetSlug = slug || initialSlug;
     if (targetSlug) {
-      const match = DESTINATIONS.find(d => d.slug === targetSlug);
+      const match = destinationsList.find(d => d.slug === targetSlug);
       if (match) {
         setActiveDestination(match);
         setTimeout(() => {
@@ -32,9 +66,9 @@ export default function DestinationsView({ initialSlug, onOpenInquiry }: Destina
     } else {
       setActiveDestination(null);
     }
-  }, [slug, initialSlug]);
+  }, [slug, initialSlug, destinationsList]);
 
-  const filteredDestinations = DESTINATIONS.filter(d => 
+  const filteredDestinations = destinationsList.filter(d => 
     d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     d.visaType.toLowerCase().includes(searchQuery.toLowerCase())
   );

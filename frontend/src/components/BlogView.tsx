@@ -16,15 +16,36 @@ interface BlogViewProps {
 export default function BlogView({ initialSlug, onNavigate, onOpenInquiry }: BlogViewProps) {
   const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
+  const [blogsList, setBlogsList] = useState<BlogPost[]>(BLOG_POSTS);
   const [activePost, setActivePost] = useState<BlogPost | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  // Fetch blogs from API with fallback to static BLOG_POSTS
+  useEffect(() => {
+    fetch('/api/public/blogs')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch blogs');
+        return res.json();
+      })
+      .then((data: BlogPost[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setBlogsList(data);
+        } else {
+          setBlogsList(BLOG_POSTS);
+        }
+      })
+      .catch(err => {
+        console.warn("Failed to fetch dynamic blogs, falling back to static BLOG_POSTS:", err);
+        setBlogsList(BLOG_POSTS);
+      });
+  }, []);
 
   // Load specific post if slug param matches (e.g. from homepage links)
   useEffect(() => {
     const targetSlug = slug || initialSlug;
     if (targetSlug) {
-      const match = BLOG_POSTS.find(p => p.slug === targetSlug);
+      const match = blogsList.find(p => p.slug === targetSlug);
       if (match) {
         setActivePost(match);
         setTimeout(() => {
@@ -34,11 +55,11 @@ export default function BlogView({ initialSlug, onNavigate, onOpenInquiry }: Blo
     } else {
       setActivePost(null);
     }
-  }, [slug, initialSlug]);
+  }, [slug, initialSlug, blogsList]);
 
   const categories = ['All', 'Visa Updates', 'Travel Tips', 'Country Guides', 'Umrah Guides'];
 
-  const filteredPosts = BLOG_POSTS.filter((post) => {
+  const filteredPosts = blogsList.filter((post) => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           post.summary.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;

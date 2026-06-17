@@ -9,7 +9,11 @@ interface SEOProps {
 export default function SEO({ title, description, keywords }: SEOProps) {
   useEffect(() => {
     // Update document title
-    document.title = `${title} | Kamal Express`;
+    if (title.includes('Kamal Express')) {
+      document.title = title;
+    } else {
+      document.title = `${title} | Kamal Express`;
+    }
 
     // Update meta description
     if (description) {

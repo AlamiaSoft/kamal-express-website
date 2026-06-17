@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import {
   FileText, Plane, Hotel, ShieldCheck, Calendar, FileCheck,
   ArrowRight, Star, Award, Shield, Users, MapPin, Sparkles, HelpCircle
@@ -24,6 +24,50 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
   const [inquiryName, setInquiryName] = useState('');
   const [inquiryService, setInquiryService] = useState('Visa Consultancy');
   const [inquiryDest, setInquiryDest] = useState('');
+
+  const [destinationsList, setDestinationsList] = useState(DESTINATIONS);
+  const [packagesList, setPackagesList] = useState(TOUR_PACKAGES);
+
+  useEffect(() => {
+    // Fetch destinations
+    fetch('/api/public/destinations')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map(d => ({
+            id: d.id,
+            name: d.name,
+            slug: d.slug,
+            image: d.image || '',
+            visaType: d.visa_type || d.visaType || '',
+            processingTime: d.processing_time || d.processingTime || '',
+            stayDuration: d.stay_duration || d.stayDuration || '',
+            validity: d.validity || '',
+            price: d.price || '',
+            requiredDocuments: Array.isArray(d.required_documents) ? d.required_documents : (Array.isArray(d.requiredDocuments) ? d.requiredDocuments : []),
+            faqs: Array.isArray(d.faqs) ? d.faqs : []
+          }));
+          setDestinationsList(mapped);
+        }
+      })
+      .catch(err => console.warn("Home: destinations fallback active:", err));
+
+    // Fetch packages
+    fetch('/api/public/packages')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPackagesList(data);
+        }
+      })
+      .catch(err => console.warn("Home: packages fallback active:", err));
+  }, []);
 
   const handleHeroInquiry = (e: FormEvent) => {
     e.preventDefault();
@@ -176,7 +220,7 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            {DESTINATIONS.slice(0, 4).map((d) => (
+            {destinationsList.slice(0, 4).map((d) => (
               <div
                 key={d.id}
                 className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between"
@@ -234,7 +278,7 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-          {TOUR_PACKAGES.slice(0, 3).map((pkg: TourPackage) => (
+          {packagesList.slice(0, 3).map((pkg: TourPackage) => (
             <div
               key={pkg.id}
               className="bg-white rounded-2xl overflow-hidden border border-gray-150/80 hover:border-emerald-100 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"

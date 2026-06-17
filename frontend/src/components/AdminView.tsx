@@ -88,8 +88,8 @@ export default function AdminView() {
   const [editAdminNotes, setEditAdminNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Navigation active tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users'
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users'>('inquiries');
+  // Navigation active tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager'
+  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager'>('inquiries');
 
   // Sales Records Data states
   const [sales, setSales] = useState<SalesTransaction[]>([]);
@@ -130,6 +130,542 @@ export default function AdminView() {
   const [saleSuccessMsg, setSaleSuccessMsg] = useState('');
   const [saleErrorMsg, setSaleErrorMsg] = useState('');
 
+  // Website Manager States
+  const [activeSubTab, setActiveSubTab] = useState<'seo' | 'blogs' | 'packages' | 'destinations' | 'faqs'>('seo');
+  const [seoPages, setSeoPages] = useState<any[]>([]);
+  const [blogsList, setBlogsList] = useState<any[]>([]);
+  const [packagesList, setPackagesList] = useState<any[]>([]);
+  const [destinationsList, setDestinationsList] = useState<any[]>([]);
+  const [faqsList, setFaqsList] = useState<any[]>([]);
+  const [isContentLoading, setIsContentLoading] = useState(false);
+  const [contentErrorMsg, setContentErrorMsg] = useState('');
+
+  // SEO Editing Form States
+  const [selectedSeo, setSelectedSeo] = useState<any | null>(null);
+  const [seoMetaTitle, setSeoMetaTitle] = useState('');
+  const [seoMetaDescription, setSeoMetaDescription] = useState('');
+  const [seoMetaKeywords, setSeoMetaKeywords] = useState('');
+  const [isSavingSeo, setIsSavingSeo] = useState(false);
+
+  // Blog Editor Modal & Form States
+  const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+  const [blogTitle, setBlogTitle] = useState('');
+  const [blogSlug, setBlogSlug] = useState('');
+  const [blogCategory, setBlogCategory] = useState('Visa Updates');
+  const [blogSummary, setBlogSummary] = useState('');
+  const [blogContent, setBlogContent] = useState('');
+  const [blogImage, setBlogImage] = useState('');
+  const [blogAuthor, setBlogAuthor] = useState('');
+  const [blogDate, setBlogDate] = useState('');
+  const [isSavingBlog, setIsSavingBlog] = useState(false);
+  const [blogModalError, setBlogModalError] = useState('');
+
+  // Package Builder Modal & Form States
+  const [selectedPkg, setSelectedPkg] = useState<any | null>(null);
+  const [isPkgModalOpen, setIsPkgModalOpen] = useState(false);
+  const [pkgId, setPkgId] = useState('');
+  const [pkgTitle, setPkgTitle] = useState('');
+  const [pkgLocation, setPkgLocation] = useState('');
+  const [pkgDuration, setPkgDuration] = useState('');
+  const [pkgPrice, setPkgPrice] = useState('');
+  const [pkgCategory, setPkgCategory] = useState<'International' | 'Domestic' | 'Customized'>('International');
+  const [pkgImage, setPkgImage] = useState('');
+  const [pkgDescription, setPkgDescription] = useState('');
+  const [pkgHighlightsText, setPkgHighlightsText] = useState('');
+  const [pkgInclusionsText, setPkgInclusionsText] = useState('');
+  const [pkgExclusionsText, setPkgExclusionsText] = useState('');
+  const [pkgItineraryText, setPkgItineraryText] = useState('');
+  const [isSavingPkg, setIsSavingPkg] = useState(false);
+  const [pkgModalError, setPkgModalError] = useState('');
+
+  // Destination Builder Modal & Form States
+  const [selectedDest, setSelectedDest] = useState<any | null>(null);
+  const [isDestModalOpen, setIsDestModalOpen] = useState(false);
+  const [destId, setDestId] = useState('');
+  const [destName, setDestName] = useState('');
+  const [destSlug, setDestSlug] = useState('');
+  const [destImage, setDestImage] = useState('');
+  const [destVisaType, setDestVisaType] = useState('');
+  const [destProcessingTime, setDestProcessingTime] = useState('');
+  const [destStayDuration, setDestStayDuration] = useState('');
+  const [destValidity, setDestValidity] = useState('');
+  const [destPrice, setDestPrice] = useState('');
+  const [destDocsText, setDestDocsText] = useState('');
+  const [destFaqsText, setDestFaqsText] = useState('');
+  const [isSavingDest, setIsSavingDest] = useState(false);
+  const [destModalError, setDestModalError] = useState('');
+
+  // FAQ Modal & Form States
+  const [selectedFaq, setSelectedFaq] = useState<any | null>(null);
+  const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
+  const [faqCategory, setFaqCategory] = useState('Visa Services');
+  const [faqQuestion, setFaqQuestion] = useState('');
+  const [faqAnswer, setFaqAnswer] = useState('');
+  const [isSavingFaq, setIsSavingFaq] = useState(false);
+  const [faqModalError, setFaqModalError] = useState('');
+
+  const fetchSeoPages = async () => {
+    setIsContentLoading(true);
+    setContentErrorMsg('');
+    try {
+      const res = await fetch('/api/public/seo');
+      if (!res.ok) throw new Error('Failed to load SEO pages');
+      const data = await res.json();
+      setSeoPages(data);
+    } catch (e: any) {
+      setContentErrorMsg(e.message);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const fetchBlogs = async () => {
+    setIsContentLoading(true);
+    setContentErrorMsg('');
+    try {
+      const res = await fetch('/api/public/blogs');
+      if (!res.ok) throw new Error('Failed to load blogs');
+      const data = await res.json();
+      setBlogsList(data);
+    } catch (e: any) {
+      setContentErrorMsg(e.message);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const fetchPackages = async () => {
+    setIsContentLoading(true);
+    setContentErrorMsg('');
+    try {
+      const res = await fetch('/api/public/packages');
+      if (!res.ok) throw new Error('Failed to load packages');
+      const data = await res.json();
+      setPackagesList(data);
+    } catch (e: any) {
+      setContentErrorMsg(e.message);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const fetchDestinations = async () => {
+    setIsContentLoading(true);
+    setContentErrorMsg('');
+    try {
+      const res = await fetch('/api/public/destinations');
+      if (!res.ok) throw new Error('Failed to load destinations');
+      const data = await res.json();
+      setDestinationsList(data);
+    } catch (e: any) {
+      setContentErrorMsg(e.message);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const fetchFaqs = async () => {
+    setIsContentLoading(true);
+    setContentErrorMsg('');
+    try {
+      const res = await fetch('/api/public/faqs');
+      if (!res.ok) throw new Error('Failed to load FAQs');
+      const data = await res.json();
+      setFaqsList(data);
+    } catch (e: any) {
+      setContentErrorMsg(e.message);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const handleEditSeo = (seo: any) => {
+    setSelectedSeo(seo);
+    setSeoMetaTitle(seo.meta_title);
+    setSeoMetaDescription(seo.meta_description);
+    setSeoMetaKeywords(seo.meta_keywords || '');
+  };
+
+  const handleUpdateSeo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedSeo) return;
+    setIsSavingSeo(true);
+    try {
+      const res = await fetch(`/api/admin/seo/${selectedSeo.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          meta_title: seoMetaTitle,
+          meta_description: seoMetaDescription,
+          meta_keywords: seoMetaKeywords
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update SEO meta.');
+      alert('SEO metadata updated and pre-rendered server files updated successfully!');
+      setSelectedSeo(null);
+      fetchSeoPages();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsSavingSeo(false);
+    }
+  };
+
+  const handleOpenBlogModal = (blog: any = null) => {
+    setSelectedBlog(blog);
+    setBlogModalError('');
+    if (blog) {
+      setBlogTitle(blog.title);
+      setBlogSlug(blog.slug);
+      setBlogCategory(blog.category);
+      setBlogSummary(blog.summary);
+      setBlogContent(blog.content);
+      setBlogImage(blog.image || '');
+      setBlogAuthor(blog.author);
+      setBlogDate(blog.date);
+    } else {
+      setBlogTitle('');
+      setBlogSlug('');
+      setBlogCategory('Visa Updates');
+      setBlogSummary('');
+      setBlogContent('');
+      setBlogImage('');
+      setBlogAuthor(fullName || username);
+      setBlogDate(new Date().toISOString().split('T')[0]);
+    }
+    setIsBlogModalOpen(true);
+  };
+
+  const handleSaveBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBlogModalError('');
+    setIsSavingBlog(true);
+    const url = selectedBlog ? `/api/admin/blogs/${selectedBlog.id}` : '/api/admin/blogs';
+    const method = selectedBlog ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: blogTitle,
+          slug: blogSlug,
+          category: blogCategory,
+          summary: blogSummary,
+          content: blogContent,
+          image: blogImage,
+          author: blogAuthor,
+          date: blogDate
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save blog post.');
+      setIsBlogModalOpen(false);
+      fetchBlogs();
+    } catch (err: any) {
+      setBlogModalError(err.message);
+    } finally {
+      setIsSavingBlog(false);
+    }
+  };
+
+  const handleDeleteBlog = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this blog post?')) return;
+    try {
+      const res = await fetch(`/api/admin/blogs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete blog.');
+      }
+      fetchBlogs();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleOpenPkgModal = (pkg: any = null) => {
+    setSelectedPkg(pkg);
+    setPkgModalError('');
+    if (pkg) {
+      setPkgId(pkg.id);
+      setPkgTitle(pkg.title);
+      setPkgLocation(pkg.location);
+      setPkgDuration(pkg.duration);
+      setPkgPrice(pkg.price);
+      setPkgCategory(pkg.category);
+      setPkgImage(pkg.image || '');
+      setPkgDescription(pkg.description);
+      setPkgHighlightsText(Array.isArray(pkg.highlights) ? pkg.highlights.join('\n') : '');
+      setPkgInclusionsText(Array.isArray(pkg.included) ? pkg.included.join('\n') : '');
+      setPkgExclusionsText(Array.isArray(pkg.excluded) ? pkg.excluded.join('\n') : '');
+      setPkgItineraryText(Array.isArray(pkg.itinerary) ? JSON.stringify(pkg.itinerary, null, 2) : '[]');
+    } else {
+      setPkgId('');
+      setPkgTitle('');
+      setPkgLocation('');
+      setPkgDuration('');
+      setPkgPrice('');
+      setPkgCategory('International');
+      setPkgImage('');
+      setPkgDescription('');
+      setPkgHighlightsText('');
+      setPkgInclusionsText('');
+      setPkgExclusionsText('');
+      setPkgItineraryText('[\n  {\n    "day": 1,\n    "title": "Arrival",\n    "description": "Airport pickup and hotel check-in."\n  }\n]');
+    }
+    setIsPkgModalOpen(true);
+  };
+
+  const handleSavePkg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPkgModalError('');
+    setIsSavingPkg(true);
+
+    let highlights = pkgHighlightsText.split('\n').map(h => h.trim()).filter(h => h !== '');
+    let included = pkgInclusionsText.split('\n').map(i => i.trim()).filter(i => i !== '');
+    let excluded = pkgExclusionsText.split('\n').map(ex => ex.trim()).filter(ex => ex !== '');
+    let itinerary = [];
+    try {
+      itinerary = JSON.parse(pkgItineraryText);
+    } catch (err) {
+      setPkgModalError('Invalid itinerary JSON format. Must be a valid JSON array.');
+      setIsSavingPkg(false);
+      return;
+    }
+
+    const url = selectedPkg ? `/api/admin/packages/${selectedPkg.id}` : '/api/admin/packages';
+    const method = selectedPkg ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id: pkgId,
+          title: pkgTitle,
+          location: pkgLocation,
+          duration: pkgDuration,
+          price: pkgPrice,
+          category: pkgCategory,
+          image: pkgImage,
+          description: pkgDescription,
+          highlights,
+          itinerary,
+          included,
+          excluded
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save package.');
+      setIsPkgModalOpen(false);
+      fetchPackages();
+    } catch (err: any) {
+      setPkgModalError(err.message);
+    } finally {
+      setIsSavingPkg(false);
+    }
+  };
+
+  const handleDeletePkg = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this package?')) return;
+    try {
+      const res = await fetch(`/api/admin/packages/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete package.');
+      }
+      fetchPackages();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleOpenDestModal = (dest: any = null) => {
+    setSelectedDest(dest);
+    setDestModalError('');
+    if (dest) {
+      setDestId(dest.id);
+      setDestName(dest.name);
+      setDestSlug(dest.slug);
+      setDestImage(dest.image || '');
+      setDestVisaType(dest.visa_type);
+      setDestProcessingTime(dest.processing_time);
+      setDestStayDuration(dest.stay_duration);
+      setDestValidity(dest.validity);
+      setDestPrice(dest.price);
+      setDestDocsText(Array.isArray(dest.required_documents) ? dest.required_documents.join('\n') : '');
+      setDestFaqsText(Array.isArray(dest.faqs) ? JSON.stringify(dest.faqs, null, 2) : '[]');
+    } else {
+      setDestId('');
+      setDestName('');
+      setDestSlug('');
+      setDestImage('');
+      setDestVisaType('');
+      setDestProcessingTime('');
+      setDestStayDuration('');
+      setDestValidity('');
+      setDestPrice('');
+      setDestDocsText('');
+      setDestFaqsText('[\n  {\n    "question": "FAQs Question",\n    "answer": "FAQs Answer."\n  }\n]');
+    }
+    setIsDestModalOpen(true);
+  };
+
+  const handleSaveDest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDestModalError('');
+    setIsSavingDest(true);
+
+    let required_documents = destDocsText.split('\n').map(d => d.trim()).filter(d => d !== '');
+    let faqs = [];
+    try {
+      faqs = JSON.parse(destFaqsText);
+    } catch (err) {
+      setDestModalError('Invalid FAQs JSON format. Must be a valid JSON array.');
+      setIsSavingDest(false);
+      return;
+    }
+
+    const url = selectedDest ? `/api/admin/destinations/${selectedDest.id}` : '/api/admin/destinations';
+    const method = selectedDest ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id: destId,
+          name: destName,
+          slug: destSlug,
+          image: destImage,
+          visa_type: destVisaType,
+          processing_time: destProcessingTime,
+          stay_duration: destStayDuration,
+          validity: destValidity,
+          price: destPrice,
+          required_documents,
+          faqs
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save destination.');
+      setIsDestModalOpen(false);
+      fetchDestinations();
+    } catch (err: any) {
+      setDestModalError(err.message);
+    } finally {
+      setIsSavingDest(false);
+    }
+  };
+
+  const handleDeleteDest = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this destination?')) return;
+    try {
+      const res = await fetch(`/api/admin/destinations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete destination.');
+      }
+      fetchDestinations();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleOpenFaqModal = (faq: any = null) => {
+    setSelectedFaq(faq);
+    setFaqModalError('');
+    if (faq) {
+      setFaqCategory(faq.category);
+      setFaqQuestion(faq.question);
+      setFaqAnswer(faq.answer);
+    } else {
+      setFaqCategory('Visa Services');
+      setFaqQuestion('');
+      setFaqAnswer('');
+    }
+    setIsFaqModalOpen(true);
+  };
+
+  const handleSaveFaq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFaqModalError('');
+    setIsSavingFaq(true);
+    const url = selectedFaq ? `/api/admin/faqs/${selectedFaq.id}` : '/api/admin/faqs';
+    const method = selectedFaq ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          category: faqCategory,
+          question: faqQuestion,
+          answer: faqAnswer
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save FAQ.');
+      setIsFaqModalOpen(false);
+      fetchFaqs();
+    } catch (err: any) {
+      setFaqModalError(err.message);
+    } finally {
+      setIsSavingFaq(false);
+    }
+  };
+
+  const handleDeleteFaq = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this FAQ?')) return;
+    try {
+      const res = await fetch(`/api/admin/faqs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete FAQ.');
+      }
+      fetchFaqs();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   // Auto calculate remaining balance on total/received change
   useEffect(() => {
     const total = parseFloat(saleTotalAmount) || 0;
@@ -156,9 +692,15 @@ export default function AdminView() {
         fetchInquiries();
       } else if (activeTab === 'users' && role === 'Admin') {
         fetchUsers();
+      } else if (activeTab === 'website-manager') {
+        if (activeSubTab === 'seo') fetchSeoPages();
+        if (activeSubTab === 'blogs') fetchBlogs();
+        if (activeSubTab === 'packages') fetchPackages();
+        if (activeSubTab === 'destinations') fetchDestinations();
+        if (activeSubTab === 'faqs') fetchFaqs();
       }
     }
-  }, [token, activeTab]);
+  }, [token, activeTab, activeSubTab]);
 
   // Dynamically inject manifest and register service worker on admin dashboard mount
   useEffect(() => {
@@ -918,6 +1460,20 @@ export default function AdminView() {
                   </button>
                 )}
 
+                <button
+                  onClick={() => { setActiveTab('website-manager'); setSelectedInquiry(null); setSelectedSale(null); setIsMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                    activeTab === 'website-manager'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Globe className="w-4 h-4" /> Website Manager
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
                 {/* Template links to look professional */}
                 <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
                   <span className="flex items-center gap-2.5">
@@ -1024,6 +1580,20 @@ export default function AdminView() {
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             )}
+
+            <button
+              onClick={() => { setActiveTab('website-manager'); setSelectedInquiry(null); setSelectedSale(null); }}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                activeTab === 'website-manager'
+                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <Globe className="w-4 h-4" /> Website Manager
+              </span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
 
             {/* Template links to look professional */}
             <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-xs cursor-not-allowed text-left transition-colors">
@@ -1143,6 +1713,9 @@ export default function AdminView() {
                 {activeTab === 'users' && (
                   <>Manage application users, assign operational roles, or suspend access credentials.</>
                 )}
+                {activeTab === 'website-manager' && (
+                  <>Manage SEO page tags, publish blog posts, configure travel packages, and update visa requirements checklist.</>
+                )}
               </p>
             </div>
             {activeTab === 'inquiries' && (
@@ -1193,90 +1766,93 @@ export default function AdminView() {
           </div>
 
           {/* Metrics Dashboard Row */}
-          {activeTab === 'inquiries' ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
-                  <Layers className="w-5 h-5" />
+          {/* Metrics Dashboard Row */}
+          {(activeTab === 'inquiries' || activeTab === 'sales-records') && (
+            activeTab === 'inquiries' ? (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Leads</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{totalLeads}</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Leads</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{totalLeads}</p>
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Pending Tasks</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{pendingLeads}</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Pending Tasks</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{pendingLeads}</p>
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-5 h-5" />
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">In Contact</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{contactedLeads}</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">In Contact</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{contactedLeads}</p>
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Closed Stays</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{closedLeads}</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Sales</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{totalSalesCount}</p>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center justify-center shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Closed Stays</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{closedLeads}</p>
+                  </div>
                 </div>
               </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Sales</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{totalSalesCount}</p>
+                  </div>
+                </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Pending Approval</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{pendingSalesCount}</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Pending Approval</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{pendingSalesCount}</p>
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-5 h-5" />
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center justify-center shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Approved</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{approvedSalesCount}</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Approved</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{approvedSalesCount}</p>
-                </div>
-              </div>
 
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-red-50 text-red-700 border border-red-100 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Rejected</span>
-                  <p className="text-xl font-black text-slate-900 leading-tight">{rejectedSalesCount}</p>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-red-50 text-red-700 border border-red-100 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Rejected</span>
+                    <p className="text-xl font-black text-slate-900 leading-tight">{rejectedSalesCount}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           )}
 
           {/* Grid Layout: Left is list card, Right is details slide-over */}
@@ -2206,6 +2782,422 @@ export default function AdminView() {
             </div>
           )}
 
+          {/* Website Content Manager Tab */}
+          {activeTab === 'website-manager' && (
+            <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden text-left animate-in fade-in duration-200">
+              {/* Sub-tab Navigation */}
+              <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-wrap gap-2 items-center justify-between">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setActiveSubTab('seo')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeSubTab === 'seo'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    SEO & Pages
+                  </button>
+                  <button
+                    onClick={() => setActiveSubTab('blogs')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeSubTab === 'blogs'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    Blogs
+                  </button>
+                  <button
+                    onClick={() => setActiveSubTab('packages')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeSubTab === 'packages'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    Travel Packages
+                  </button>
+                  <button
+                    onClick={() => setActiveSubTab('destinations')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeSubTab === 'destinations'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    Visa Guides
+                  </button>
+                  <button
+                    onClick={() => setActiveSubTab('faqs')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeSubTab === 'faqs'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    FAQs
+                  </button>
+                </div>
+
+                {/* Create/Action Buttons */}
+                {activeSubTab === 'blogs' && (
+                  <button
+                    onClick={() => handleOpenBlogModal()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Add Blog Post
+                  </button>
+                )}
+                {activeSubTab === 'packages' && (
+                  <button
+                    onClick={() => handleOpenPkgModal()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Add Package
+                  </button>
+                )}
+                {activeSubTab === 'destinations' && (
+                  <button
+                    onClick={() => handleOpenDestModal()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Add Visa Guide
+                  </button>
+                )}
+                {activeSubTab === 'faqs' && (
+                  <button
+                    onClick={() => handleOpenFaqModal()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Add FAQ
+                  </button>
+                )}
+              </div>
+
+              {/* Loader */}
+              {isContentLoading ? (
+                <div className="py-24 text-center space-y-4">
+                  <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mx-auto" />
+                  <p className="text-xs text-slate-400">Loading website contents...</p>
+                </div>
+              ) : contentErrorMsg ? (
+                <div className="py-20 text-center space-y-4 max-w-xs mx-auto text-xs text-red-500 font-semibold">
+                  <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
+                  <p>{contentErrorMsg}</p>
+                </div>
+              ) : (
+                <div className="p-6">
+                  
+                  {/* SEO SUB-TAB CONTENT */}
+                  {activeSubTab === 'seo' && (
+                    <div className="space-y-6">
+                      {selectedSeo ? (
+                        // SEO Update Form
+                        <form onSubmit={handleUpdateSeo} className="space-y-4 max-w-xl text-xs font-semibold">
+                          <h4 className="text-sm font-bold text-slate-900">Edit Meta Tags for route: <span className="text-emerald-600">/{selectedSeo.route_path}</span></h4>
+                          <div className="space-y-1.5">
+                            <label className="text-slate-650 block">Meta Title</label>
+                            <input
+                              type="text"
+                              required
+                              value={seoMetaTitle}
+                              onChange={(e) => setSeoMetaTitle(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50/20 text-slate-900 focus:outline-none focus:border-emerald-600 bg-white"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-slate-650 block">Meta Description</label>
+                            <textarea
+                              required
+                              rows={3}
+                              value={seoMetaDescription}
+                              onChange={(e) => setSeoMetaDescription(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50/20 text-slate-900 focus:outline-none focus:border-emerald-600 bg-white"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-slate-650 block">Keywords (Comma separated)</label>
+                            <input
+                              type="text"
+                              value={seoMetaKeywords}
+                              onChange={(e) => setSeoMetaKeywords(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50/20 text-slate-900 focus:outline-none focus:border-emerald-600 bg-white"
+                              placeholder="travel, tourism, caravans"
+                            />
+                          </div>
+                          <div className="pt-2 flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSeo(null)}
+                              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl border border-slate-200 transition-all cursor-pointer text-center"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={isSavingSeo}
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                            >
+                              {isSavingSeo ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save & Sync Page
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        // SEO Pages Table
+                        <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-455 uppercase tracking-wider">
+                                <th className="py-4 px-6 text-left">Route / Page</th>
+                                <th className="py-4 px-6 text-left">Meta Title</th>
+                                <th className="py-4 px-6 text-left">Meta Description</th>
+                                <th className="py-4 px-6 text-center">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 text-xs">
+                              {seoPages.map((page) => (
+                                <tr key={page.id} className="hover:bg-slate-50/30">
+                                  <td className="py-4 px-6 font-bold text-slate-900 text-left">
+                                    /{page.route_path || 'home'}
+                                  </td>
+                                  <td className="py-4 px-6 text-slate-800 text-left font-semibold truncate max-w-[200px]">
+                                    {page.meta_title}
+                                  </td>
+                                  <td className="py-4 px-6 text-slate-450 text-left font-medium truncate max-w-[350px]">
+                                    {page.meta_description}
+                                  </td>
+                                  <td className="py-4 px-6 text-center">
+                                    <button
+                                      onClick={() => handleEditSeo(page)}
+                                      className="text-xs font-bold text-emerald-600 hover:text-emerald-750 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 transition-all cursor-pointer"
+                                    >
+                                      Edit Meta
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* BLOGS SUB-TAB CONTENT */}
+                  {activeSubTab === 'blogs' && (
+                    <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-455 uppercase tracking-wider">
+                            <th className="py-4 px-6 text-left">Post Details</th>
+                            <th className="py-4 px-6 text-left">Category</th>
+                            <th className="py-4 px-6 text-left">Author & Date</th>
+                            <th className="py-4 px-6 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs">
+                          {blogsList.length === 0 ? (
+                            <tr>
+                              <td colSpan={4} className="py-12 text-center text-slate-400 font-bold">No dynamic blogs found. Standard fallback active.</td>
+                            </tr>
+                          ) : (
+                            blogsList.map((blog) => (
+                              <tr key={blog.id} className="hover:bg-slate-50/30">
+                                <td className="py-4 px-6 text-left space-y-1">
+                                  <span className="font-extrabold text-slate-900 block">{blog.title}</span>
+                                  <span className="text-[10px] text-slate-400 block truncate max-w-[280px] font-medium">{blog.summary}</span>
+                                </td>
+                                <td className="py-4 px-6 text-left font-bold text-slate-700">
+                                  {blog.category}
+                                </td>
+                                <td className="py-4 px-6 text-left space-y-0.5 font-semibold text-slate-650">
+                                  <span className="block font-bold">By {blog.author}</span>
+                                  <span className="text-[10px] text-slate-400 block">{new Date(blog.date).toLocaleDateString()}</span>
+                                </td>
+                                <td className="py-4 px-6 text-center space-x-2">
+                                  <button
+                                    onClick={() => handleOpenBlogModal(blog)}
+                                    className="text-xs font-bold text-emerald-600 hover:text-emerald-750 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteBlog(blog.id)}
+                                    className="text-xs font-bold text-red-650 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* PACKAGES SUB-TAB CONTENT */}
+                  {activeSubTab === 'packages' && (
+                    <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-455 uppercase tracking-wider">
+                            <th className="py-4 px-6 text-left">Package Title</th>
+                            <th className="py-4 px-6 text-left">Category & Location</th>
+                            <th className="py-4 px-6 text-left">Duration & Price</th>
+                            <th className="py-4 px-6 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs">
+                          {packagesList.length === 0 ? (
+                            <tr>
+                              <td colSpan={4} className="py-12 text-center text-slate-400 font-bold">No dynamic packages found. Standard fallback active.</td>
+                            </tr>
+                          ) : (
+                            packagesList.map((pkg) => (
+                              <tr key={pkg.id} className="hover:bg-slate-50/30">
+                                <td className="py-4 px-6 text-left font-extrabold text-slate-900">
+                                  {pkg.title}
+                                </td>
+                                <td className="py-4 px-6 text-left space-y-0.5 font-bold text-slate-700">
+                                  <span className="block">{pkg.category}</span>
+                                  <span className="text-[10px] text-slate-400 block font-semibold">{pkg.location}</span>
+                                </td>
+                                <td className="py-4 px-6 text-left space-y-0.5 font-semibold text-slate-650">
+                                  <span className="block">{pkg.duration}</span>
+                                  <span className="text-[10px] text-emerald-600 block font-black">{pkg.price}</span>
+                                </td>
+                                <td className="py-4 px-6 text-center space-x-2">
+                                  <button
+                                    onClick={() => handleOpenPkgModal(pkg)}
+                                    className="text-xs font-bold text-emerald-600 hover:text-emerald-750 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeletePkg(pkg.id)}
+                                    className="text-xs font-bold text-red-655 hover:text-red-750 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* VISA GUIDES / DESTINATIONS SUB-TAB CONTENT */}
+                  {activeSubTab === 'destinations' && (
+                    <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-455 uppercase tracking-wider">
+                            <th className="py-4 px-6 text-left">Country Name</th>
+                            <th className="py-4 px-6 text-left">Visa Type</th>
+                            <th className="py-4 px-6 text-left">Processing & Price</th>
+                            <th className="py-4 px-6 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs">
+                          {destinationsList.length === 0 ? (
+                            <tr>
+                              <td colSpan={4} className="py-12 text-center text-slate-400 font-bold">No dynamic destinations found. Standard fallback active.</td>
+                            </tr>
+                          ) : (
+                            destinationsList.map((dest) => (
+                              <tr key={dest.id} className="hover:bg-slate-50/30">
+                                <td className="py-4 px-6 text-left font-extrabold text-slate-900">
+                                  {dest.name} (/{dest.slug})
+                                </td>
+                                <td className="py-4 px-6 text-left font-bold text-slate-700">
+                                  {dest.visa_type}
+                                </td>
+                                <td className="py-4 px-6 text-left space-y-0.5 font-semibold text-slate-650">
+                                  <span className="block">{dest.processing_time}</span>
+                                  <span className="text-[10px] text-emerald-600 block font-black">{dest.price}</span>
+                                </td>
+                                <td className="py-4 px-6 text-center space-x-2">
+                                  <button
+                                    onClick={() => handleOpenDestModal(dest)}
+                                    className="text-xs font-bold text-emerald-600 hover:text-emerald-750 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteDest(dest.id)}
+                                    className="text-xs font-bold text-red-655 hover:text-red-750 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* FAQS SUB-TAB CONTENT */}
+                  {activeSubTab === 'faqs' && (
+                    <div className="overflow-x-auto border border-slate-150 rounded-2xl">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-[#fcfbfd] border-b border-slate-100 text-[10px] font-bold text-slate-455 uppercase tracking-wider">
+                            <th className="py-4 px-6 text-left">Faq Question</th>
+                            <th className="py-4 px-6 text-left">Category</th>
+                            <th className="py-4 px-6 text-left">Answer Preview</th>
+                            <th className="py-4 px-6 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs">
+                          {faqsList.length === 0 ? (
+                            <tr>
+                              <td colSpan={4} className="py-12 text-center text-slate-400 font-bold">No dynamic FAQs found. Standard fallback active.</td>
+                            </tr>
+                          ) : (
+                            faqsList.map((faq) => (
+                              <tr key={faq.id} className="hover:bg-slate-50/30">
+                                <td className="py-4 px-6 text-left font-extrabold text-slate-900 max-w-[200px]">
+                                  {faq.question}
+                                </td>
+                                <td className="py-4 px-6 text-left font-bold text-slate-700">
+                                  {faq.category}
+                                </td>
+                                <td className="py-4 px-6 text-left text-slate-450 truncate max-w-[300px] font-medium">
+                                  {faq.answer}
+                                </td>
+                                <td className="py-4 px-6 text-center space-x-2">
+                                  <button
+                                    onClick={() => handleOpenFaqModal(faq)}
+                                    className="text-xs font-bold text-emerald-600 hover:text-emerald-750 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteFaq(faq.id)}
+                                    className="text-xs font-bold text-red-655 hover:text-red-755 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                </div>
+              )}
+            </div>
+          )}
+
           {/* User Add/Edit Dialog Modal */}
           {isUserModalOpen && role === 'Admin' && (
             <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
@@ -2338,6 +3330,627 @@ export default function AdminView() {
                         <>
                           <Save className="w-4 h-4" /> Save User
                         </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Blog Editor Dialog Modal */}
+          {isBlogModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+              <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-150 text-left animate-in zoom-in-95 duration-250">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                  <h3 className="text-base font-extrabold text-slate-950">
+                    {selectedBlog ? 'Edit Blog Post' : 'Add Blog Post'}
+                  </h3>
+                  <button
+                    onClick={() => { setIsBlogModalOpen(false); setSelectedBlog(null); }}
+                    className="text-slate-400 hover:text-slate-655 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveBlog} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                  {blogModalError && (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex gap-3 text-xs text-red-650 font-semibold leading-relaxed">
+                      <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
+                      <span>{blogModalError}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={blogTitle}
+                        onChange={(e) => {
+                          setBlogTitle(e.target.value);
+                          if (!selectedBlog) {
+                            setBlogSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+                          }
+                        }}
+                        placeholder="e.g. Hunza Travel Guide"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Slug</label>
+                      <input
+                        type="text"
+                        required
+                        value={blogSlug}
+                        onChange={(e) => setBlogSlug(e.target.value)}
+                        placeholder="hunza-travel-guide"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Category</label>
+                      <select
+                        value={blogCategory}
+                        onChange={(e) => setBlogCategory(e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-600 bg-white text-slate-700 cursor-pointer"
+                      >
+                        <option value="Visa Updates">Visa Updates</option>
+                        <option value="Travel Tips">Travel Tips</option>
+                        <option value="Country Guides">Country Guides</option>
+                        <option value="Umrah Guides">Umrah Guides</option>
+                        <option value="Airline News">Airline News</option>
+                        <option value="Travel Insurance Advice">Travel Insurance Advice</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Cover Image URL</label>
+                      <input
+                        type="text"
+                        value={blogImage}
+                        onChange={(e) => setBlogImage(e.target.value)}
+                        placeholder="https://images.unsplash.com/photo..."
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Author Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={blogAuthor}
+                        onChange={(e) => setBlogAuthor(e.target.value)}
+                        placeholder="System Administrator"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Publish Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={blogDate}
+                        onChange={(e) => setBlogDate(e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Summary / Subtitle</label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={blogSummary}
+                      onChange={(e) => setBlogSummary(e.target.value)}
+                      placeholder="Brief excerpt summarizing the blog post..."
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Full Article Content (HTML/Text)</label>
+                    <textarea
+                      required
+                      rows={8}
+                      value={blogContent}
+                      onChange={(e) => setBlogContent(e.target.value)}
+                      placeholder="Type the full article content here. You can use standard HTML paragraph tags like <p>...</p>."
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white font-mono"
+                    />
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setIsBlogModalOpen(false); setSelectedBlog(null); }}
+                      className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all text-xs text-center cursor-pointer border border-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingBlog}
+                      className="w-1/2 bg-emerald-600 hover:bg-emerald-750 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {isSavingBlog ? (
+                        <><RefreshCw className="w-4 h-4 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="w-4 h-4" /> Save Article</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Package Builder Dialog Modal */}
+          {isPkgModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+              <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-150 text-left animate-in zoom-in-95 duration-250">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                  <h3 className="text-base font-extrabold text-slate-950">
+                    {selectedPkg ? 'Edit Travel Package' : 'Create Travel Package'}
+                  </h3>
+                  <button
+                    onClick={() => { setIsPkgModalOpen(false); setSelectedPkg(null); }}
+                    className="text-slate-400 hover:text-slate-655 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSavePkg} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                  {pkgModalError && (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex gap-3 text-xs text-red-650 font-semibold leading-relaxed">
+                      <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
+                      <span>{pkgModalError}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Package ID (Unique Key)</label>
+                      <input
+                        type="text"
+                        required
+                        disabled={!!selectedPkg}
+                        value={pkgId}
+                        onChange={(e) => setPkgId(e.target.value)}
+                        placeholder="e.g. tour-hunza"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white disabled:bg-slate-100 font-bold"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Package Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={pkgTitle}
+                        onChange={(e) => setPkgTitle(e.target.value)}
+                        placeholder="Hunza Dream Tour"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Location / Scope</label>
+                      <input
+                        type="text"
+                        required
+                        value={pkgLocation}
+                        onChange={(e) => setPkgLocation(e.target.value)}
+                        placeholder="Hunza Valley"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Duration</label>
+                      <input
+                        type="text"
+                        required
+                        value={pkgDuration}
+                        onChange={(e) => setPkgDuration(e.target.value)}
+                        placeholder="7 Days / 6 Nights"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Starting Price (PKR/USD)</label>
+                      <input
+                        type="text"
+                        required
+                        value={pkgPrice}
+                        onChange={(e) => setPkgPrice(e.target.value)}
+                        placeholder="PKR 85,000"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Category</label>
+                      <select
+                        value={pkgCategory}
+                        onChange={(e) => setPkgCategory(e.target.value as any)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-600 bg-white text-slate-700 cursor-pointer"
+                      >
+                        <option value="International">International</option>
+                        <option value="Domestic">Domestic</option>
+                        <option value="Customized">Customized</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5 md:col-span-2">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Image URL</label>
+                      <input
+                        type="text"
+                        value={pkgImage}
+                        onChange={(e) => setPkgImage(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Description</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={pkgDescription}
+                      onChange={(e) => setPkgDescription(e.target.value)}
+                      placeholder="Detailed overview about the travel itinerary..."
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-semibold">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Highlights (One per line)</label>
+                      <textarea
+                        rows={4}
+                        value={pkgHighlightsText}
+                        onChange={(e) => setPkgHighlightsText(e.target.value)}
+                        placeholder="Attabad Lake Boating&#10;Khunjerab Border Crossing"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Inclusions (One per line)</label>
+                      <textarea
+                        rows={4}
+                        value={pkgInclusionsText}
+                        onChange={(e) => setPkgInclusionsText(e.target.value)}
+                        placeholder="Premium Transport&#10;Breakfast Buffet"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Exclusions (One per line)</label>
+                      <textarea
+                        rows={4}
+                        value={pkgExclusionsText}
+                        onChange={(e) => setPkgExclusionsText(e.target.value)}
+                        placeholder="Lunch & Dinner&#10;Personal Porter Fees"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Itinerary Steps (JSON Array)</label>
+                    <textarea
+                      required
+                      rows={6}
+                      value={pkgItineraryText}
+                      onChange={(e) => setPkgItineraryText(e.target.value)}
+                      placeholder={'[\n  {\n    "day": 1,\n    "title": "Arrival",\n    "description": "Pickup and transit..."\n  }\n]'}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white font-mono"
+                    />
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setIsPkgModalOpen(false); setSelectedPkg(null); }}
+                      className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all text-xs text-center cursor-pointer border border-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingPkg}
+                      className="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {isSavingPkg ? (
+                        <><RefreshCw className="w-4 h-4 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="w-4 h-4" /> Save Package</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Destination Builder Dialog Modal */}
+          {isDestModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+              <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-150 text-left animate-in zoom-in-95 duration-250">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                  <h3 className="text-base font-extrabold text-slate-950">
+                    {selectedDest ? 'Edit Visa Guide' : 'Create Visa Guide'}
+                  </h3>
+                  <button
+                    onClick={() => { setIsDestModalOpen(false); setSelectedDest(null); }}
+                    className="text-slate-400 hover:text-slate-655 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveDest} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                  {destModalError && (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex gap-3 text-xs text-red-650 font-semibold leading-relaxed">
+                      <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
+                      <span>{destModalError}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Destination ID</label>
+                      <input
+                        type="text"
+                        required
+                        disabled={!!selectedDest}
+                        value={destId}
+                        onChange={(e) => setDestId(e.target.value)}
+                        placeholder="e.g. dest-uae"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white disabled:bg-slate-100 font-bold"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Country Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={destName}
+                        onChange={(e) => setDestName(e.target.value)}
+                        placeholder="United Arab Emirates"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Slug (URL Path)</label>
+                      <input
+                        type="text"
+                        required
+                        value={destSlug}
+                        onChange={(e) => setDestSlug(e.target.value)}
+                        placeholder="uae"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Visa Type Details</label>
+                      <input
+                        type="text"
+                        required
+                        value={destVisaType}
+                        onChange={(e) => setDestVisaType(e.target.value)}
+                        placeholder="Tourist eVisa (30 Days)"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Processing Duration</label>
+                      <input
+                        type="text"
+                        required
+                        value={destProcessingTime}
+                        onChange={(e) => setDestProcessingTime(e.target.value)}
+                        placeholder="2 - 3 Working Days"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Stay Limit</label>
+                      <input
+                        type="text"
+                        required
+                        value={destStayDuration}
+                        onChange={(e) => setDestStayDuration(e.target.value)}
+                        placeholder="30 Days from entry"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Validity Period</label>
+                      <input
+                        type="text"
+                        required
+                        value={destValidity}
+                        onChange={(e) => setDestValidity(e.target.value)}
+                        placeholder="60 Days from issuance"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Starting Fee</label>
+                      <input
+                        type="text"
+                        required
+                        value={destPrice}
+                        onChange={(e) => setDestPrice(e.target.value)}
+                        placeholder="USD 110"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5 md:col-span-2">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Image URL</label>
+                      <input
+                        type="text"
+                        value={destImage}
+                        onChange={(e) => setDestImage(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Required Documents List (One per line)</label>
+                    <textarea
+                      required
+                      rows={4}
+                      value={destDocsText}
+                      onChange={(e) => setDestDocsText(e.target.value)}
+                      placeholder="Passport Scan (min 6 months validity)&#10;White Background Photo"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 text-xs font-semibold">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Destination Specific FAQs (JSON Array)</label>
+                    <textarea
+                      required
+                      rows={5}
+                      value={destFaqsText}
+                      onChange={(e) => setDestFaqsText(e.target.value)}
+                      placeholder={'[\n  {\n    "question": "FAQ Question?",\n    "answer": "FAQ Answer."\n  }\n]'}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white font-mono"
+                    />
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setIsDestModalOpen(false); setSelectedDest(null); }}
+                      className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all text-xs text-center cursor-pointer border border-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingDest}
+                      className="w-1/2 bg-emerald-600 hover:bg-emerald-750 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {isSavingDest ? (
+                        <><RefreshCw className="w-4 h-4 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="w-4 h-4" /> Save Guide</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* FAQ Dialog Modal */}
+          {isFaqModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+              <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-150 text-left animate-in zoom-in-95 duration-250">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                  <h3 className="text-base font-extrabold text-slate-950">
+                    {selectedFaq ? 'Edit FAQ Item' : 'Add FAQ Item'}
+                  </h3>
+                  <button
+                    onClick={() => { setIsFaqModalOpen(false); setSelectedFaq(null); }}
+                    className="text-slate-400 hover:text-slate-655 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveFaq} className="p-6 space-y-4">
+                  {faqModalError && (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex gap-3 text-xs text-red-650 font-semibold leading-relaxed">
+                      <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
+                      <span>{faqModalError}</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-4 text-xs font-semibold">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Category</label>
+                      <select
+                        value={faqCategory}
+                        onChange={(e) => setFaqCategory(e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-600 bg-white text-slate-700 cursor-pointer"
+                      >
+                        <option value="Visa Services">Visa Services</option>
+                        <option value="Air Ticketing">Air Ticketing</option>
+                        <option value="Hotel Booking">Hotel Booking</option>
+                        <option value="Umrah">Umrah</option>
+                        <option value="Tour Packages">Tour Packages</option>
+                        <option value="Travel Insurance">Travel Insurance</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Question</label>
+                      <input
+                        type="text"
+                        required
+                        value={faqQuestion}
+                        onChange={(e) => setFaqQuestion(e.target.value)}
+                        placeholder="e.g. Do I need a transit visa?"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-655 uppercase tracking-wider block">Answer Details</label>
+                      <textarea
+                        required
+                        rows={4}
+                        value={faqAnswer}
+                        onChange={(e) => setFaqAnswer(e.target.value)}
+                        placeholder="Explain the answer thoroughly..."
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-600 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setIsFaqModalOpen(false); setSelectedFaq(null); }}
+                      className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all text-xs text-center cursor-pointer border border-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingFaq}
+                      className="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {isSavingFaq ? (
+                        <><RefreshCw className="w-4 h-4 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="w-4 h-4" /> Save FAQ</>
                       )}
                     </button>
                   </div>

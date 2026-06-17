@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -34,6 +34,42 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalService, setModalService] = useState('');
   const [modalDestination, setModalDestination] = useState('');
+
+  // Dynamic SEO metadata mapping
+  const [seoData, setSeoData] = useState<Record<string, { meta_title: string; meta_description: string; meta_keywords?: string }>>({});
+
+  useEffect(() => {
+    fetch('/api/public/seo')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mapping: typeof seoData = {};
+          data.forEach(item => {
+            mapping[item.route_path] = {
+              meta_title: item.meta_title,
+              meta_description: item.meta_description,
+              meta_keywords: item.meta_keywords || ''
+            };
+          });
+          setSeoData(mapping);
+        }
+      })
+      .catch(err => {
+        console.warn("Failed to fetch dynamic SEO metadata, falling back to defaults:", err);
+      });
+  }, []);
+
+  const getSeoProps = (routePath: string, defaultTitle: string, defaultDesc: string, defaultKeys: string = '') => {
+    const dynamic = seoData[routePath];
+    return {
+      title: dynamic?.meta_title || defaultTitle,
+      description: dynamic?.meta_description || defaultDesc,
+      keywords: dynamic?.meta_keywords || defaultKeys
+    };
+  };
 
   // Map path to view names for Navbar item active highlighting
   const getCurrentView = (): string => {
@@ -121,9 +157,11 @@ export default function App() {
           <Route path="/" element={
             <>
               <SEO 
-                title="Home - Approved Visas, Lowest Fares & Custom Tours" 
-                description="Kamal Express is Pakistan's premium visa consulting, air ticketing, hotel booking, and pilgrimage Umrah caravan service agency in Islamabad Blue Area."
-                keywords="visa consultancy Islamabad, travel agency Blue Area, Umrah packages Pakistan, discount flights Islamabad"
+                {...getSeoProps('', 
+                  "Home - Approved Visas, Lowest Fares & Custom Tours", 
+                  "Kamal Express is Pakistan's premium visa consulting, air ticketing, hotel booking, and pilgrimage Umrah caravan service agency in Islamabad Blue Area.",
+                  "visa consultancy Islamabad, travel agency Blue Area, Umrah packages Pakistan, discount flights Islamabad"
+                )}
               />
               <HomeView onNavigate={handleNavigate} onOpenInquiry={handleOpenInquiry} />
             </>
@@ -132,8 +170,10 @@ export default function App() {
           <Route path="/about" element={
             <>
               <SEO 
-                title="About Us - Decades of Travel Industry Heritage" 
-                description="Learn about the history, vision, and Mufti-led leadership team of Kamal Express, a certified IATA and Ministry-licensed agency."
+                {...getSeoProps('about', 
+                  "About Us - Decades of Travel Industry Heritage", 
+                  "Learn about the history, vision, and Mufti-led leadership team of Kamal Express, a certified IATA and Ministry-licensed agency."
+                )}
               />
               <AboutView />
             </>
@@ -142,8 +182,10 @@ export default function App() {
           <Route path="/services" element={
             <>
               <SEO 
-                title="Our Services - Visa Consulting, Tickets & Lodging" 
-                description="Explore our core ticketing, hotel reservation, travel insurance, apostille stamp verification, and embassy slot coordinates."
+                {...getSeoProps('services', 
+                  "Our Services - Visa Consulting, Tickets & Lodging", 
+                  "Explore our core ticketing, hotel reservation, travel insurance, apostille stamp verification, and embassy slot coordinates."
+                )}
               />
               <ServicesView onOpenInquiry={(s) => handleOpenInquiry(s)} />
             </>
@@ -152,8 +194,10 @@ export default function App() {
           <Route path="/services/:serviceId" element={
             <>
               <SEO 
-                title="Services - Detailed Visa, Fares & Protection Guidelines" 
-                description="Explore our core ticketing, hotel reservation, travel insurance, apostille stamp verification, and embassy slot coordinates."
+                {...getSeoProps('services', 
+                  "Services - Detailed Visa, Fares & Protection Guidelines", 
+                  "Explore our core ticketing, hotel reservation, travel insurance, apostille stamp verification, and embassy slot coordinates."
+                )}
               />
               <ServicesView onOpenInquiry={(s) => handleOpenInquiry(s)} />
             </>
@@ -162,8 +206,10 @@ export default function App() {
           <Route path="/umrah" element={
             <>
               <SEO 
-                title="Umrah Packages - Economy & Premium Haram Caravan Plans" 
-                description="Book custom boutique 3-Star, 4-Star, and Grand 5-Star clock tower near-Haram Umrah groups. Direct support and Shariah guide review."
+                {...getSeoProps('umrah', 
+                  "Umrah Packages - Economy & Premium Haram Caravan Plans", 
+                  "Book custom boutique 3-Star, 4-Star, and Grand 5-Star clock tower near-Haram Umrah groups. Direct support and Shariah guide review."
+                )}
               />
               <UmrahView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} />
             </>
@@ -172,8 +218,10 @@ export default function App() {
           <Route path="/tours" element={
             <>
               <SEO 
-                title="Tours & Holiday Packages - Leisure Explorations" 
-                description="Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                {...getSeoProps('tours', 
+                  "Tours & Holiday Packages - Leisure Explorations", 
+                  "Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                )}
               />
               <ToursView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} />
             </>
@@ -182,8 +230,10 @@ export default function App() {
           <Route path="/tours/:category" element={
             <>
               <SEO 
-                title="Tours Packages - Customized Vacation Retributions" 
-                description="Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                {...getSeoProps('tours', 
+                  "Tours Packages - Customized Vacation Retributions", 
+                  "Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                )}
               />
               <ToursView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} />
             </>
@@ -192,8 +242,10 @@ export default function App() {
           <Route path="/tours/:category/:selectedTourId" element={
             <>
               <SEO 
-                title="Tour Itinerary Details - Kamal Express" 
-                description="Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                {...getSeoProps('tours', 
+                  "Tour Itinerary Details - Kamal Express", 
+                  "Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides."
+                )}
               />
               <ToursView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} />
             </>
@@ -202,8 +254,10 @@ export default function App() {
           <Route path="/destinations" element={
             <>
               <SEO 
-                title="Destinations & Visa Rules - Embassy Guidelines" 
-                description="Search visa requirements, fee indexes, valid stays, and required documents for UAE, UK, Schengen, Turkey, Canada, and more."
+                {...getSeoProps('destinations', 
+                  "Destinations & Visa Rules - Embassy Guidelines", 
+                  "Search visa requirements, fee indexes, valid stays, and required documents for UAE, UK, Schengen, Turkey, Canada, and more."
+                )}
               />
               <DestinationsView onOpenInquiry={handleOpenInquiry} />
             </>
@@ -212,8 +266,10 @@ export default function App() {
           <Route path="/destinations/:slug" element={
             <>
               <SEO 
-                title="Visa Requirements & Guidelines - Kamal Express" 
-                description="Search visa requirements, fee indexes, valid stays, and required documents for UAE, UK, Schengen, Turkey, Canada, and more."
+                {...getSeoProps('destinations', 
+                  "Visa Requirements & Guidelines - Kamal Express", 
+                  "Search visa requirements, fee indexes, valid stays, and required documents for UAE, UK, Schengen, Turkey, Canada, and more."
+                )}
               />
               <DestinationsView onOpenInquiry={handleOpenInquiry} />
             </>
@@ -222,8 +278,10 @@ export default function App() {
           <Route path="/blog" element={
             <>
               <SEO 
-                title="Blog, Travel Updates & Handbooks - Kamal Express" 
-                description="Read international visa update notifications, physical Umrah check packing handbooks, and luggage baggage travel tips."
+                {...getSeoProps('blog', 
+                  "Blog, Travel Updates & Handbooks - Kamal Express", 
+                  "Read international visa update notifications, physical Umrah check packing handbooks, and luggage baggage travel tips."
+                )}
               />
               <BlogView onNavigate={handleNavigate} onOpenInquiry={(s) => handleOpenInquiry(s)} />
             </>
@@ -232,8 +290,10 @@ export default function App() {
           <Route path="/blog/:slug" element={
             <>
               <SEO 
-                title="Blog & Update Details - Kamal Express" 
-                description="Read international visa update notifications, physical Umrah check packing handbooks, and luggage baggage travel tips."
+                {...getSeoProps('blog', 
+                  "Blog & Update Details - Kamal Express", 
+                  "Read international visa update notifications, physical Umrah check packing handbooks, and luggage baggage travel tips."
+                )}
               />
               <BlogView onNavigate={handleNavigate} onOpenInquiry={(s) => handleOpenInquiry(s)} />
             </>
@@ -242,8 +302,10 @@ export default function App() {
           <Route path="/contact" element={
             <>
               <SEO 
-                title="Contact Us - Corporate Office Blue Area Islamabad" 
-                description="Visit our office at Aalay Plaza Blue Area, call (051) 2726807, or submit a priority contact ticket for quick support response."
+                {...getSeoProps('contact', 
+                  "Contact Us - Corporate Office Blue Area Islamabad", 
+                  "Visit our office at Aalay Plaza Blue Area, call (051) 2726807, or submit a priority contact ticket for quick support response."
+                )}
               />
               <ContactView />
             </>

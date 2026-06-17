@@ -82,6 +82,147 @@ try {
     error_log("Users Schema Migration/Seeding Error: " . $e->getMessage());
 }
 
+// Auto-migration for content management tables
+try {
+    // 1. pages_seo
+    if (!Capsule::schema()->hasTable('pages_seo')) {
+        Capsule::schema()->create('pages_seo', function ($table) {
+            $table->id();
+            $table->string('route_path', 100)->unique();
+            $table->string('meta_title', 150);
+            $table->string('meta_description', 255);
+            $table->string('meta_keywords', 255)->nullable();
+            $table->timestamps();
+        });
+
+        // Seed initial default pages SEO metadata
+        Capsule::table('pages_seo')->insert([
+            [
+                'route_path' => '',
+                'meta_title' => 'Kamal Express - Approved Visas, Lowest Fares & Custom Tours',
+                'meta_description' => 'Your Trusted Visa Consultant & Travel Agency in Pakistan. From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands.',
+                'meta_keywords' => 'visa consultancy Islamabad, travel agency Blue Area, Umrah packages Pakistan, discount flights Islamabad',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'about',
+                'meta_title' => 'About Us - Decades of Travel Industry Heritage | Kamal Express',
+                'meta_description' => 'Learn about the history, vision, and Mufti-led leadership team of Kamal Express, a certified IATA and Ministry-licensed agency.',
+                'meta_keywords' => 'about Kamal Express, travel history, leadership team, IATA certified travel agent Islamabad',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'services',
+                'meta_title' => 'Our Services - Visa Consulting, Tickets & Lodging | Kamal Express',
+                'meta_description' => 'Explore our core ticketing, hotel reservation, travel insurance, apostille stamp verification, and embassy slot coordinates.',
+                'meta_keywords' => 'visa services, flight booking, hotel reservation, travel insurance, document legalization',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'umrah',
+                'meta_title' => 'Umrah Packages - Economy & Premium Haram Caravan Plans | Kamal Express',
+                'meta_description' => 'Book custom boutique 3-Star, 4-Star, and Grand 5-Star clock tower near-Haram Umrah groups. Direct support and Shariah guide review.',
+                'meta_keywords' => 'Umrah packages 2026, Umrah Islamabad, cheap Umrah packages, premium Umrah group',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'tours',
+                'meta_title' => 'Tours & Holiday Packages - Leisure Explorations | Kamal Express',
+                'meta_description' => 'Book top-rated customizable domestic and international vacation itineraries with dedicated transit drivers and expert guides.',
+                'meta_keywords' => 'holiday packages, leisure tours, tour packages Pakistan, international tours Islamabad',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'destinations',
+                'meta_title' => 'Destinations & Visa Rules - Embassy Guidelines | Kamal Express',
+                'meta_description' => 'Search visa requirements, fee indexes, valid stays, and required documents for UAE, UK, Schengen, Turkey, Canada, and more.',
+                'meta_keywords' => 'visa requirements Pakistan, Schengen visa documents, UK visa requirements, UAE visa fee',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'blog',
+                'meta_title' => 'Blog, Travel Updates & Handbooks | Kamal Express',
+                'meta_description' => 'Read international visa update notifications, physical Umrah check packing handbooks, and luggage baggage travel tips.',
+                'meta_keywords' => 'travel blog Pakistan, visa updates, Umrah guide, travel tips',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'route_path' => 'contact',
+                'meta_title' => 'Contact Us - Corporate Office Blue Area Islamabad | Kamal Express',
+                'meta_description' => 'Visit our office at Aalay Plaza Blue Area, call (051) 2726807, or submit a priority contact ticket for quick support response.',
+                'meta_keywords' => 'contact Kamal Express, travel agency phone, office address Islamabad, Blue Area travel agent',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')
+            ]
+        ]);
+    }
+
+    // 2. blogs
+    if (!Capsule::schema()->hasTable('blogs')) {
+        Capsule::schema()->create('blogs', function ($table) {
+            $table->id();
+            $table->string('slug', 100)->unique();
+            $table->string('title', 200);
+            $table->string('category', 100);
+            $table->text('summary');
+            $table->longText('content');
+            $table->string('image', 255)->nullable();
+            $table->date('date');
+            $table->string('author', 100);
+            $table->timestamps();
+        });
+    }
+
+    // 3. tour_packages
+    if (!Capsule::schema()->hasTable('tour_packages')) {
+        Capsule::schema()->create('tour_packages', function ($table) {
+            $table->string('id', 50)->primary();
+            $table->string('title', 200);
+            $table->string('location', 150);
+            $table->string('duration', 50);
+            $table->string('price', 50);
+            $table->string('category', 50);
+            $table->string('image', 255)->nullable();
+            $table->text('description');
+            $table->json('highlights')->nullable();
+            $table->json('itinerary')->nullable();
+            $table->json('included')->nullable();
+            $table->json('excluded')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    // 4. destinations
+    if (!Capsule::schema()->hasTable('destinations')) {
+        Capsule::schema()->create('destinations', function ($table) {
+            $table->string('id', 50)->primary();
+            $table->string('name', 150);
+            $table->string('slug', 50)->unique();
+            $table->string('image', 255)->nullable();
+            $table->string('visa_type', 150);
+            $table->string('processing_time', 150);
+            $table->string('stay_duration', 150);
+            $table->string('validity', 150);
+            $table->string('price', 50);
+            $table->json('required_documents')->nullable();
+            $table->json('faqs')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    // 5. faqs
+    if (!Capsule::schema()->hasTable('faqs')) {
+        Capsule::schema()->create('faqs', function ($table) {
+            $table->id();
+            $table->string('category', 100);
+            $table->text('question');
+            $table->text('answer');
+            $table->timestamps();
+        });
+    }
+} catch (\Exception $e) {
+    error_log("Content Tables Auto-migration Error: " . $e->getMessage());
+}
+
 // 3. Initialize Slim App
 $app = AppFactory::create();
 
@@ -127,6 +268,28 @@ $app->delete('/admin/users/{id}', [\App\Controllers\UserController::class, 'dele
 $app->post('/admin/sales', [\App\Controllers\SalesController::class, 'recordSale']);
 $app->get('/admin/sales', [\App\Controllers\SalesController::class, 'getSales']);
 $app->put('/admin/sales/{id}', [\App\Controllers\SalesController::class, 'updateSaleStatus']);
+
+// Public Content Read Routes
+$app->get('/public/seo', [\App\Controllers\ContentController::class, 'getPublicSeo']);
+$app->get('/public/blogs', [\App\Controllers\ContentController::class, 'getPublicBlogs']);
+$app->get('/public/packages', [\App\Controllers\ContentController::class, 'getPublicPackages']);
+$app->get('/public/destinations', [\App\Controllers\ContentController::class, 'getPublicDestinations']);
+$app->get('/public/faqs', [\App\Controllers\ContentController::class, 'getPublicFaqs']);
+
+// Admin Content Editor Routes
+$app->put('/admin/seo/{id}', [\App\Controllers\ContentController::class, 'updateSeo']);
+$app->post('/admin/blogs', [\App\Controllers\ContentController::class, 'createBlog']);
+$app->put('/admin/blogs/{id}', [\App\Controllers\ContentController::class, 'updateBlog']);
+$app->delete('/admin/blogs/{id}', [\App\Controllers\ContentController::class, 'deleteBlog']);
+$app->post('/admin/packages', [\App\Controllers\ContentController::class, 'createPackage']);
+$app->put('/admin/packages/{id}', [\App\Controllers\ContentController::class, 'updatePackage']);
+$app->delete('/admin/packages/{id}', [\App\Controllers\ContentController::class, 'deletePackage']);
+$app->post('/admin/destinations', [\App\Controllers\ContentController::class, 'createDestination']);
+$app->put('/admin/destinations/{id}', [\App\Controllers\ContentController::class, 'updateDestination']);
+$app->delete('/admin/destinations/{id}', [\App\Controllers\ContentController::class, 'deleteDestination']);
+$app->post('/admin/faqs', [\App\Controllers\ContentController::class, 'createFaq']);
+$app->put('/admin/faqs/{id}', [\App\Controllers\ContentController::class, 'updateFaq']);
+$app->delete('/admin/faqs/{id}', [\App\Controllers\ContentController::class, 'deleteFaq']);
 
 // Email Action Routes (Public)
 $app->get('/sales/approve/{token}', [\App\Controllers\SalesController::class, 'approveViaEmail']);

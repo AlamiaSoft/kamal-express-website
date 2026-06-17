@@ -15,10 +15,31 @@ export default function ToursView({ onOpenInquiry }: ToursViewProps) {
   const { category, selectedTourId } = useParams<{ category?: string; selectedTourId?: string }>();
   const navigate = useNavigate();
 
+  const [packagesList, setPackagesList] = useState<TourPackage[]>(TOUR_PACKAGES);
   const [activeCategory, setActiveCategory] = useState<'All' | 'International' | 'Domestic' | 'Customized'>(
     'All'
   );
   const [selectedTour, setSelectedTour] = useState<TourPackage | null>(null);
+
+  // Fetch packages from API with fallback to static TOUR_PACKAGES
+  useEffect(() => {
+    fetch('/api/public/packages')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch packages');
+        return res.json();
+      })
+      .then((data: TourPackage[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPackagesList(data);
+        } else {
+          setPackagesList(TOUR_PACKAGES);
+        }
+      })
+      .catch(err => {
+        console.warn("Failed to fetch dynamic packages, falling back to static TOUR_PACKAGES:", err);
+        setPackagesList(TOUR_PACKAGES);
+      });
+  }, []);
 
   // Apply filters on URL parameter changes
   useEffect(() => {
@@ -34,7 +55,7 @@ export default function ToursView({ onOpenInquiry }: ToursViewProps) {
     }
 
     if (selectedTourId) {
-      const matched = TOUR_PACKAGES.find(p => p.id === selectedTourId);
+      const matched = packagesList.find(p => p.id === selectedTourId);
       if (matched) {
         setSelectedTour(matched);
         // Scroll to the top of the detail sheet
@@ -46,10 +67,10 @@ export default function ToursView({ onOpenInquiry }: ToursViewProps) {
     } else {
       setSelectedTour(null);
     }
-  }, [category, selectedTourId]);
+  }, [category, selectedTourId, packagesList]);
 
   // Filter package matching categories
-  const filteredPackages = TOUR_PACKAGES.filter((p) => {
+  const filteredPackages = packagesList.filter((p) => {
     if (activeCategory === 'All') return true;
     return p.category === activeCategory;
   });
