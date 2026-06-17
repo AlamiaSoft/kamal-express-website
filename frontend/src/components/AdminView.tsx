@@ -176,9 +176,10 @@ export default function AdminView() {
     appleIconLink.id = 'pwa-apple-icon';
     document.head.appendChild(appleIconLink);
 
-    // 3. Register service worker scoped to /admin
+    // 3. Register service worker with dynamic scope (subdomain root '/' vs local testing '/admin')
+    const scope = window.location.hostname.includes('aladmin') ? '/' : '/admin';
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js', { scope: '/admin' })
+      navigator.serviceWorker.register('/service-worker.js', { scope })
         .then(reg => {
           console.log('CRM PWA Service Worker registered successfully for scope:', reg.scope);
         })

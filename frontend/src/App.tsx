@@ -21,6 +21,14 @@ import SEO from './components/SEO';
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isAladminSubdomain = 
+    window.location.hostname.startsWith('aladmin') || 
+    window.location.hostname.includes('aladmin');
+    
+  const isLocalhost = 
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1';
   
   // Modal controllers
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +37,8 @@ export default function App() {
 
   // Map path to view names for Navbar item active highlighting
   const getCurrentView = (): string => {
+    if (isAladminSubdomain) return 'admin';
+
     const path = location.pathname;
     if (path.startsWith('/about')) return 'about';
     if (path.startsWith('/services')) return 'services';
@@ -74,6 +84,24 @@ export default function App() {
   };
 
   const currentView = getCurrentView();
+
+  if (isAladminSubdomain) {
+    return (
+      <div className="min-h-screen bg-[#f8f7fa] text-slate-800 font-sans flex flex-col justify-between selection:bg-emerald-500/20 selection:text-emerald-950">
+        <SEO 
+          title="CRM Staff Portal - Kamal Express" 
+          description="Internal CRM portal for staff members to access inquiry records."
+        />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<AdminView />} />
+            <Route path="/admin" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-800 font-sans flex flex-col justify-between selection:bg-emerald-500/20 selection:text-emerald-950">
@@ -222,13 +250,17 @@ export default function App() {
           } />
           
           <Route path="/admin" element={
-            <>
-              <SEO 
-                title="CRM Staff Portal - Kamal Express" 
-                description="Internal CRM portal for staff members to access inquiry records."
-              />
-              <AdminView />
-            </>
+            isLocalhost ? (
+              <>
+                <SEO 
+                  title="CRM Staff Portal - Kamal Express" 
+                  description="Internal CRM portal for staff members to access inquiry records."
+                />
+                <AdminView />
+              </>
+            ) : (
+              <Navigate to="/" replace />
+            )
           } />
           
           {/* Catch-all redirect to Home */}

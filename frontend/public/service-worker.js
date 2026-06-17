@@ -1,6 +1,6 @@
 const CACHE_NAME = 'ke-crm-v1';
 const ASSETS_TO_CACHE = [
-  '/admin',
+  '/',
   '/logo.jpeg',
   '/manifest.json'
 ];
