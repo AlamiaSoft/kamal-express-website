@@ -5,7 +5,16 @@ import {
 } from 'lucide-react';
 import { Inquiry } from '../types';
 
-export default function ContactView() {
+interface ContactViewProps {
+  pageContent?: {
+    address?: string;
+    phone?: string;
+    email?: string;
+    gmaps_iframe?: string;
+  };
+}
+
+export default function ContactView({ pageContent }: ContactViewProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -63,59 +72,45 @@ export default function ContactView() {
             email,
             phone,
             serviceType: subject,
-            destination: 'Contact Form Message',
+            destination: '',
             notes: msg,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            status: 'Pending'
+            status: 'Pending',
+            created_at: new Date().toISOString()
           };
-
-          // Add to local Storage list
-          const existingStr = localStorage.getItem('kamal_express_inquiries');
-          const list: Inquiry[] = existingStr ? JSON.parse(existingStr) : [];
-          list.unshift(newInquiry);
-          localStorage.setItem('kamal_express_inquiries', JSON.stringify(list));
-
+          const updated = [newInquiry, ...localTickets];
+          localStorage.setItem('kamal_express_inquiries', JSON.stringify(updated));
+          setLocalTickets(updated);
           setSuccessMsg(true);
-          loadLocalTickets(); // Refresh list
-
-          // Reset
           setName('');
           setEmail('');
           setPhone('');
           setMsg('');
-          setWebsite('');
         } else {
-          alert(result.message || 'An error occurred while sending your contact message.');
+          alert(result.message || 'Failed to submit contact ticket.');
         }
       })
-      .catch((err) => {
-        console.error('Contact Submission Error:', err);
-        alert('Failed to connect to the host server. Please check your network or try again.');
-      })
-      .finally(() => {
-        setIsSending(false);
-      });
+      .catch(() => alert('Network error. Failed to submit contact ticket.'))
+      .finally(() => setIsSending(false));
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 space-y-16 animate-in fade-in duration-300">
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 animate-in fade-in duration-300">
+      
       {/* Page Header */}
-      <div className="text-left space-y-4 border-b border-gray-100 pb-8">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
-          Contact Our Corporate Branch
+      <div className="space-y-4 text-center">
+        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-950">
+          Get in Touch with Our Experts
         </h1>
-        <p className="text-gray-500 text-sm md:text-base max-w-2xl leading-relaxed">
-          Visit our hospitality suite in Aalay Plaza, Islamabad, chat directly on WhatsApp, or compose a quick contact ticket block below.
+        <p className="text-sm md:text-base text-slate-500 max-w-xl mx-auto leading-relaxed">
+          Have an inquiry regarding visa eligibility or corporate ticketing agreements? Submit a ticket below or call our support desk.
         </p>
       </div>
 
-      {/* Grid: Coordinates Info left, Form right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-
-        {/* Coordinates Details Col */}
-        <div className="lg:col-span-5 space-y-8 text-left">
-
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Contact info column */}
+        <div className="lg:col-span-5 space-y-8">
+          
           <div className="bg-white rounded-2xl border border-gray-150 p-6 md:p-8 space-y-6 shadow-2xs">
             <h3 className="text-lg font-bold text-gray-950">Branch Coordinates</h3>
 
@@ -127,7 +122,7 @@ export default function ContactView() {
                 <div className="space-y-1">
                   <span className="text-xs text-gray-400 font-bold tracking-wide uppercase">Office Location</span>
                   <p className="text-sm text-gray-700 font-semibold leading-relaxed">
-                    Office No. 05, 2nd Floor, Aalay Plaza, 7th Ave, near Kalsoom Hospital, G-6/3 G 6/2 Blue Area, Islamabad, 46000
+                    {pageContent?.address || "Office No. 05, 2nd Floor, Aalay Plaza, 7th Ave, near Kalsoom Hospital, G-6/3 G 6/2 Blue Area, Islamabad, 46000"}
                   </p>
                 </div>
               </div>
@@ -139,7 +134,7 @@ export default function ContactView() {
                 <div className="space-y-1">
                   <span className="text-xs text-gray-400 font-bold tracking-wide uppercase">Telephone Line</span>
                   <p className="text-sm text-gray-700 font-semibold">
-                    (051) 2726807
+                    {pageContent?.phone || "(051) 2726807"}
                   </p>
                 </div>
               </div>
@@ -151,8 +146,8 @@ export default function ContactView() {
                 <div className="space-y-1">
                   <span className="text-xs text-gray-400 font-bold tracking-wide uppercase">Support Email</span>
                   <p className="text-sm text-gray-700 font-semibold">
-                    <a href="mailto:hello@kamalexpress.com.pk" className="hover:text-emerald-600 transition-colors">
-                      hello@kamalexpress.com.pk
+                    <a href={`mailto:${pageContent?.email || "hello@kamalexpress.com.pk"}`} className="hover:text-emerald-600 transition-colors">
+                      {pageContent?.email || "hello@kamalexpress.com.pk"}
                     </a>
                   </p>
                 </div>
@@ -199,7 +194,7 @@ export default function ContactView() {
             <div className="h-56 rounded-xl overflow-hidden border border-gray-150 bg-slate-100 relative">
               <iframe
                 title="Kamal Express Aalay Plaza Map"
-                src="https://maps.google.com/maps?q=Aalay%20Plaza,%20Blue%20Area,%20Islamabad&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                src={pageContent?.gmaps_iframe || "https://maps.google.com/maps?q=Aalay%20Plaza,%20Blue%20Area,%20Islamabad&t=&z=15&ie=UTF8&iwloc=&output=embed"}
                 className="w-full h-full border-0"
                 allowFullScreen={false}
                 loading="lazy"

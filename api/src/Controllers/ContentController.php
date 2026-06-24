@@ -3,7 +3,7 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Models\PagesSeo;
+use App\Models\Page;
 use App\Models\BlogPost;
 use App\Models\TourPackage;
 use App\Models\Destination;
@@ -17,7 +17,7 @@ class ContentController {
      * ========================================================================= */
 
     public function getPublicSeo(Request $request, Response $response): Response {
-        $seo = PagesSeo::all();
+        $seo = Page::all();
         return $this->jsonResponse($response, $seo);
     }
 
@@ -42,8 +42,16 @@ class ContentController {
     }
 
     /* =========================================================================
-     * 2. Admin CRUD APIs - Pages SEO & Template Rewriter
+     * 2. Admin CRUD APIs - Pages Content & SEO Manager
      * ========================================================================= */
+
+    public function getAdminSeo(Request $request, Response $response): Response {
+        if (!$this->isAuthenticated($request)) {
+            return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
+        }
+        $seo = Page::all();
+        return $this->jsonResponse($response, $seo);
+    }
 
     public function updateSeo(Request $request, Response $response, array $args): Response {
         if (!$this->isAuthenticated($request)) {
@@ -54,9 +62,9 @@ class ContentController {
         }
 
         $id = isset($args['id']) ? intval($args['id']) : 0;
-        $seo = PagesSeo::find($id);
-        if (!$seo) {
-            return $this->jsonResponse($response, ['error' => 'SEO record not found.'], 404);
+        $page = Page::find($id);
+        if (!$page) {
+            return $this->jsonResponse($response, ['error' => 'Page record not found.'], 404);
         }
 
         $data = json_decode($request->getBody()->getContents(), true);
@@ -68,18 +76,23 @@ class ContentController {
             return $this->jsonResponse($response, ['error' => 'Meta Title and Description are required.'], 400);
         }
 
-        $seo->meta_title = $metaTitle;
-        $seo->meta_description = $metaDescription;
-        $seo->meta_keywords = $metaKeywords;
-        $seo->save();
+        $page->meta_title = $metaTitle;
+        $page->meta_description = $metaDescription;
+        $page->meta_keywords = $metaKeywords;
+
+        if (isset($data['content'])) {
+            $page->content = $data['content'];
+        }
+
+        $page->save();
 
         // Server-Side SEO Pre-rendering HTML Update
-        $this->rewriteStaticHtmlMeta($seo->route_path, $metaTitle, $metaDescription, $metaKeywords);
+        $this->rewriteStaticHtmlMeta($page->route_path, $metaTitle, $metaDescription, $metaKeywords);
 
         return $this->jsonResponse($response, [
             'success' => true,
-            'message' => 'SEO page updated successfully and pre-rendered server headers synced.',
-            'seo' => $seo
+            'message' => 'Page updated successfully and pre-rendered server headers synced.',
+            'page' => $page
         ]);
     }
 
@@ -116,8 +129,14 @@ class ContentController {
             'content' => trim($data['content']),
             'image' => isset($data['image']) ? trim($data['image']) : '',
             'author' => trim($data['author']),
-            'date' => trim($data['date'])
+            'date' => trim($data['date']),
+            'meta_title' => isset($data['meta_title']) ? trim($data['meta_title']) : null,
+            'meta_description' => isset($data['meta_description']) ? trim($data['meta_description']) : null,
+            'meta_keywords' => isset($data['meta_keywords']) ? trim($data['meta_keywords']) : null
         ]);
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("blog/{$blog->slug}", $blog->meta_title ?: $blog->title, $blog->meta_description ?: $blog->summary, $blog->meta_keywords);
 
         return $this->jsonResponse($response, ['success' => true, 'blog' => $blog]);
     }
@@ -152,8 +171,15 @@ class ContentController {
         if (isset($data['image'])) $blog->image = trim($data['image']);
         if (isset($data['author'])) $blog->author = trim($data['author']);
         if (isset($data['date'])) $blog->date = trim($data['date']);
+        if (isset($data['meta_title'])) $blog->meta_title = trim($data['meta_title']);
+        if (isset($data['meta_description'])) $blog->meta_description = trim($data['meta_description']);
+        if (isset($data['meta_keywords'])) $blog->meta_keywords = trim($data['meta_keywords']);
 
         $blog->save();
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("blog/{$blog->slug}", $blog->meta_title ?: $blog->title, $blog->meta_description ?: $blog->summary, $blog->meta_keywords);
+
         return $this->jsonResponse($response, ['success' => true, 'blog' => $blog]);
     }
 
@@ -212,8 +238,14 @@ class ContentController {
             'highlights' => isset($data['highlights']) ? $data['highlights'] : [],
             'itinerary' => isset($data['itinerary']) ? $data['itinerary'] : [],
             'included' => isset($data['included']) ? $data['included'] : [],
-            'excluded' => isset($data['excluded']) ? $data['excluded'] : []
+            'excluded' => isset($data['excluded']) ? $data['excluded'] : [],
+            'meta_title' => isset($data['meta_title']) ? trim($data['meta_title']) : null,
+            'meta_description' => isset($data['meta_description']) ? trim($data['meta_description']) : null,
+            'meta_keywords' => isset($data['meta_keywords']) ? trim($data['meta_keywords']) : null
         ]);
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("tours/" . strtolower($package->category) . "/{$package->id}", $package->meta_title ?: $package->title, $package->meta_description ?: $package->description, $package->meta_keywords);
 
         return $this->jsonResponse($response, ['success' => true, 'package' => $package]);
     }
@@ -245,8 +277,15 @@ class ContentController {
         if (isset($data['itinerary'])) $package->itinerary = $data['itinerary'];
         if (isset($data['included'])) $package->included = $data['included'];
         if (isset($data['excluded'])) $package->excluded = $data['excluded'];
+        if (isset($data['meta_title'])) $package->meta_title = trim($data['meta_title']);
+        if (isset($data['meta_description'])) $package->meta_description = trim($data['meta_description']);
+        if (isset($data['meta_keywords'])) $package->meta_keywords = trim($data['meta_keywords']);
 
         $package->save();
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("tours/" . strtolower($package->category) . "/{$package->id}", $package->meta_title ?: $package->title, $package->meta_description ?: $package->description, $package->meta_keywords);
+
         return $this->jsonResponse($response, ['success' => true, 'package' => $package]);
     }
 
@@ -305,8 +344,14 @@ class ContentController {
             'validity' => trim($data['validity']),
             'price' => trim($data['price']),
             'required_documents' => isset($data['required_documents']) ? $data['required_documents'] : [],
-            'faqs' => isset($data['faqs']) ? $data['faqs'] : []
+            'faqs' => isset($data['faqs']) ? $data['faqs'] : [],
+            'meta_title' => isset($data['meta_title']) ? trim($data['meta_title']) : null,
+            'meta_description' => isset($data['meta_description']) ? trim($data['meta_description']) : null,
+            'meta_keywords' => isset($data['meta_keywords']) ? trim($data['meta_keywords']) : null
         ]);
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("destinations/{$destination->slug}", $destination->meta_title ?: $destination->name, $destination->meta_description ?: $destination->visa_type, $destination->meta_keywords);
 
         return $this->jsonResponse($response, ['success' => true, 'destination' => $destination]);
     }
@@ -344,8 +389,15 @@ class ContentController {
         if (isset($data['price'])) $destination->price = trim($data['price']);
         if (isset($data['required_documents'])) $destination->required_documents = $data['required_documents'];
         if (isset($data['faqs'])) $destination->faqs = $data['faqs'];
+        if (isset($data['meta_title'])) $destination->meta_title = trim($data['meta_title']);
+        if (isset($data['meta_description'])) $destination->meta_description = trim($data['meta_description']);
+        if (isset($data['meta_keywords'])) $destination->meta_keywords = trim($data['meta_keywords']);
 
         $destination->save();
+
+        // Sync static HTML pre-rendered headers if it exists
+        $this->rewriteStaticHtmlMeta("destinations/{$destination->slug}", $destination->meta_title ?: $destination->name, $destination->meta_description ?: $destination->visa_type, $destination->meta_keywords);
+
         return $this->jsonResponse($response, ['success' => true, 'destination' => $destination]);
     }
 

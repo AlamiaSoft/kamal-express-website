@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { DESTINATIONS } from '../data';
 import { Destination } from '../types';
+import SEO from './SEO';
 
 interface DestinationsViewProps {
   initialSlug?: string;
@@ -89,7 +90,11 @@ export default function DestinationsView({ initialSlug, onOpenInquiry }: Destina
       {activeDestination ? (
         /* ==================== 1. DETAILED DESTINATION SUB-PAGE ==================== */
         <div className="space-y-12 text-left animate-in fade-in slide-in-from-top-4 duration-300">
-          
+          <SEO 
+            title={activeDestination.meta_title || `${activeDestination.name} Visa Requirements & Guidelines`} 
+            description={activeDestination.meta_description || `Find visa requirements, checklist of required documents, fees, processing times, and FAQs for ${activeDestination.name} visa applications.`} 
+            keywords={activeDestination.meta_keywords || ''} 
+          />
           {/* Breadcrumb row & Back button */}
           <div className="flex justify-between items-center bg-slate-50 border border-gray-150 p-3 rounded-xl mb-4 text-xs font-semibold">
             <div className="text-gray-400">

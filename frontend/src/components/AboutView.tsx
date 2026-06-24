@@ -1,6 +1,16 @@
 import { Shield, Sparkles, Building2, MapPin, Eye, Compass, Users2, Award } from 'lucide-react';
 
-export default function AboutView() {
+interface AboutViewProps {
+  pageContent?: {
+    story_p1?: string;
+    story_p2?: string;
+    story_p3?: string;
+    vision?: string;
+    mission?: string;
+  };
+}
+
+export default function AboutView({ pageContent }: AboutViewProps) {
   return (
     <div className="space-y-16 pb-16 animate-in fade-in duration-300">
       
@@ -32,13 +42,13 @@ export default function AboutView() {
             </h2>
             <div className="space-y-4 text-sm text-gray-600 leading-relaxed font-normal">
               <p>
-                Founded with a dedicated mission to simplify complicated visa routes and optimize sky travel fares, <strong>Kamal Express</strong> has evolved from a boutique ticketing agency into raw power inside Islamabad's Blue Area travel ecosystem. 
+                {pageContent?.story_p1 || "Founded with a dedicated mission to simplify complicated visa routes and optimize sky travel fares, Kamal Express has evolved from a boutique ticketing agency into raw power inside Islamabad's Blue Area travel ecosystem."} 
               </p>
               <p>
-                From our corporate offices inside Aalay Plaza, Blue Area, we have successfully drafted thousands of application folders representing tourist, business, student, and family migration streams. We maintain active direct integration with major regional and global travel networks, unlocking discounted wholesale room supplies and secure transport lines for our pilgrims.
+                {pageContent?.story_p2 || "From our corporate offices inside Aalay Plaza, Blue Area, we have successfully drafted thousands of application folders representing tourist, business, student, and family migration streams. We maintain active direct integration with major regional and global travel networks, unlocking discounted wholesale room supplies and secure transport lines for our pilgrims."}
               </p>
               <p>
-                We do not just hand over itinerary plans; we take complete end-to-end accountability. That means checking your active bank records prior to dossier submission, conducting live mock physical interviews, scheduling biometric checkpoints early, and having physical on-ground coordinators travel alongside our Umrah and Northern Area retreat caravans.
+                {pageContent?.story_p3 || "We do not just hand over itinerary plans; we take complete end-to-end accountability. That means checking your active bank records prior to dossier submission, conducting live mock physical interviews, scheduling biometric checkpoints early, and having physical on-ground coordinators travel alongside our Umrah and Northern Area retreat caravans."}
               </p>
             </div>
           </div>
@@ -74,7 +84,7 @@ export default function AboutView() {
             </div>
             <h3 className="text-xl font-bold text-gray-950">Our Vision</h3>
             <p className="text-sm text-gray-500 leading-relaxed font-normal">
-              To be recognized as the most reliable, transparent, and profile-focused travel consulting agency in South Asia, enabling hassle-free visual gateways to the world while preserving authentic spiritual and cultural exploration values.
+              {pageContent?.vision || "To be recognized as the most reliable, transparent, and profile-focused travel consulting agency in South Asia, enabling hassle-free visual gateways to the world while preserving authentic spiritual and cultural exploration values."}
             </p>
           </div>
 
@@ -84,7 +94,7 @@ export default function AboutView() {
             </div>
             <h3 className="text-xl font-bold text-gray-950">Our Mission</h3>
             <p className="text-sm text-gray-500 leading-relaxed font-normal">
-              To deliver pristine flight ticketing, customized near-Haram Umrah logistics, and comprehensive, highly audited visa consultancy operations that maximize success ratios through personalized profiles, transparent pricing, and stellar direct physical care.
+              {pageContent?.mission || "To deliver pristine flight ticketing, customized near-Haram Umrah logistics, and comprehensive, highly audited visa consultancy operations that maximize success ratios through personalized profiles, transparent pricing, and stellar direct physical care."}
             </p>
           </div>
 

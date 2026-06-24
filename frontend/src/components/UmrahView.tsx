@@ -3,9 +3,12 @@ import { PILGRIMAGE_UMRAH } from '../data';
 
 interface UmrahViewProps {
   onOpenInquiry: (service?: string, notes?: string) => void;
+  pageContent?: {
+    intro_desc?: string;
+  };
 }
 
-export default function UmrahView({ onOpenInquiry }: UmrahViewProps) {
+export default function UmrahView({ onOpenInquiry, pageContent }: UmrahViewProps) {
   return (
     <div className="space-y-16 pb-20 animate-in fade-in duration-300">
       
@@ -26,7 +29,7 @@ export default function UmrahView({ onOpenInquiry }: UmrahViewProps) {
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Sacred Umrah Pilgrimage Packages</h1>
           <p className="text-teal-100 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            {PILGRIMAGE_UMRAH.description}
+            {pageContent?.intro_desc || PILGRIMAGE_UMRAH.description}
           </p>
         </div>
       </section>

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { TOUR_PACKAGES } from '../data';
 import { TourPackage } from '../types';
+import SEO from './SEO';
 
 interface ToursViewProps {
   onOpenInquiry: (service?: string, notes?: string) => void;
@@ -195,6 +196,11 @@ export default function ToursView({ onOpenInquiry }: ToursViewProps) {
             id="tour-detail-anchor"
             className="lg:col-span-6 bg-white rounded-2xl border border-gray-200 p-6 md:p-8 text-left space-y-8 shadow-md"
           >
+            <SEO 
+              title={selectedTour.meta_title || selectedTour.title} 
+              description={selectedTour.meta_description || selectedTour.description} 
+              keywords={selectedTour.meta_keywords || ''} 
+            />
             {/* Header section with closing button */}
             <div className="flex justify-between items-start gap-4">
               <div>

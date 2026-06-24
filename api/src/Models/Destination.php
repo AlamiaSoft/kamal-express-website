@@ -20,7 +20,10 @@ class Destination extends Model {
         'validity',
         'price',
         'required_documents',
-        'faqs'
+        'faqs',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     protected $casts = [

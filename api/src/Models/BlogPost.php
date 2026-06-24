@@ -14,6 +14,9 @@ class BlogPost extends Model {
         'content',
         'image',
         'date',
-        'author'
+        'author',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 }

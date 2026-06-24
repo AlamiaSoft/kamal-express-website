@@ -21,7 +21,10 @@ class TourPackage extends Model {
         'highlights',
         'itinerary',
         'included',
-        'excluded'
+        'excluded',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     protected $casts = [

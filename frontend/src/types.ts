@@ -20,6 +20,9 @@ export interface TourPackage {
   itinerary: { day: number; title: string; description: string }[];
   included: string[];
   excluded: string[];
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
 }
 
 export interface Destination {
@@ -34,6 +37,9 @@ export interface Destination {
   price: string;
   requiredDocuments: string[];
   faqs: { question: string; answer: string }[];
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
 }
 
 export interface BlogPost {
@@ -46,6 +52,9 @@ export interface BlogPost {
   image: string;
   date: string;
   author: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
 }
 
 export interface FAQ {

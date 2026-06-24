@@ -37,6 +37,7 @@ export default function App() {
 
   // Dynamic SEO metadata mapping
   const [seoData, setSeoData] = useState<Record<string, { meta_title: string; meta_description: string; meta_keywords?: string }>>({});
+  const [pageContents, setPageContents] = useState<Record<string, any>>({});
 
   useEffect(() => {
     fetch('/api/public/seo')
@@ -47,14 +48,19 @@ export default function App() {
       .then(data => {
         if (Array.isArray(data)) {
           const mapping: typeof seoData = {};
+          const contents: typeof pageContents = {};
           data.forEach(item => {
             mapping[item.route_path] = {
               meta_title: item.meta_title,
               meta_description: item.meta_description,
               meta_keywords: item.meta_keywords || ''
             };
+            if (item.content) {
+              contents[item.route_path] = item.content;
+            }
           });
           setSeoData(mapping);
+          setPageContents(contents);
         }
       })
       .catch(err => {
@@ -163,7 +169,7 @@ export default function App() {
                   "visa consultancy Islamabad, travel agency Blue Area, Umrah packages Pakistan, discount flights Islamabad"
                 )}
               />
-              <HomeView onNavigate={handleNavigate} onOpenInquiry={handleOpenInquiry} />
+              <HomeView onNavigate={handleNavigate} onOpenInquiry={handleOpenInquiry} pageContent={pageContents['']} />
             </>
           } />
           
@@ -175,7 +181,7 @@ export default function App() {
                   "Learn about the history, vision, and Mufti-led leadership team of Kamal Express, a certified IATA and Ministry-licensed agency."
                 )}
               />
-              <AboutView />
+              <AboutView pageContent={pageContents['about']} />
             </>
           } />
           
@@ -211,7 +217,7 @@ export default function App() {
                   "Book custom boutique 3-Star, 4-Star, and Grand 5-Star clock tower near-Haram Umrah groups. Direct support and Shariah guide review."
                 )}
               />
-              <UmrahView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} />
+              <UmrahView onOpenInquiry={(s, notes) => handleOpenInquiry(s, notes)} pageContent={pageContents['umrah']} />
             </>
           } />
           
@@ -307,7 +313,7 @@ export default function App() {
                   "Visit our office at Aalay Plaza Blue Area, call (051) 2726807, or submit a priority contact ticket for quick support response."
                 )}
               />
-              <ContactView />
+              <ContactView pageContent={pageContents['contact']} />
             </>
           } />
           

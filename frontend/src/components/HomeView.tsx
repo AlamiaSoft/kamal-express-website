@@ -9,6 +9,10 @@ import { TourPackage } from '../types';
 interface HomeViewProps {
   onNavigate: (view: string, params?: any) => void;
   onOpenInquiry: (service?: string, destination?: string) => void;
+  pageContent?: {
+    hero_title?: string;
+    hero_subtitle?: string;
+  };
 }
 
 const iconMap: Record<string, any> = {
@@ -20,7 +24,7 @@ const iconMap: Record<string, any> = {
   FileCheck: FileCheck,
 };
 
-export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
+export default function HomeView({ onNavigate, onOpenInquiry, pageContent }: HomeViewProps) {
   const [inquiryName, setInquiryName] = useState('');
   const [inquiryService, setInquiryService] = useState('Visa Consultancy');
   const [inquiryDest, setInquiryDest] = useState('');
@@ -97,10 +101,10 @@ export default function HomeView({ onNavigate, onOpenInquiry }: HomeViewProps) {
               <Sparkles className="w-3.5 h-3.5" /> Your Ultimate Travel Partner
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Your Trusted Visa Consultant & <span className="text-emerald-400">Travel Agency</span> in Pakistan.
+              {pageContent?.hero_title || "Your Trusted Visa Consultant & Travel Agency in Pakistan."}
             </h1>
             <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
-              From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands. Let our experts handle the paperwork while you pack your bags.
+              {pageContent?.hero_subtitle || "From stress-free visa processing to custom international tour packages, Kamal Express & Holidays ensures your travel plans are in safe hands. Let our experts handle the paperwork while you pack your bags."}
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <button

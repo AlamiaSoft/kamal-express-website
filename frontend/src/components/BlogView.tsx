@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { BLOG_POSTS } from '../data';
 import { BlogPost } from '../types';
+import SEO from './SEO';
 
 interface BlogViewProps {
   initialSlug?: string;
@@ -82,7 +83,11 @@ export default function BlogView({ initialSlug, onNavigate, onOpenInquiry }: Blo
       {activePost ? (
         /* ==================== 1. DETAILED SINGLE BLOG POST VIEW ==================== */
         <article className="max-w-4xl mx-auto text-left space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
-          
+          <SEO 
+            title={activePost.meta_title || activePost.title} 
+            description={activePost.meta_description || activePost.summary} 
+            keywords={activePost.meta_keywords || ''} 
+          />
           {/* Back Trigger */}
           <button
             onClick={handleBackToList}
