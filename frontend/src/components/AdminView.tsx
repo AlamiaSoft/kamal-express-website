@@ -340,19 +340,21 @@ export default function AdminView() {
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
 
-                <button
-                  onClick={() => { setActiveTab('sms-logs'); setIsMobileMenuOpen(false); }}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
-                    activeTab === 'sms-logs'
-                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                {role === 'Admin' && (
+                  <button
+                    onClick={() => { setActiveTab('sms-logs'); setIsMobileMenuOpen(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                      activeTab === 'sms-logs'
+                        ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -467,19 +469,21 @@ export default function AdminView() {
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
 
-            <button
-              onClick={() => setActiveTab('sms-logs')}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
-                activeTab === 'sms-logs'
-                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
-              }`}
-            >
-              <span className="flex items-center gap-2.5">
-                <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
-              </span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+            {role === 'Admin' && (
+              <button
+                onClick={() => setActiveTab('sms-logs')}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                  activeTab === 'sms-logs'
+                    ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                }`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
+                </span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -621,7 +625,7 @@ export default function AdminView() {
             />
           )}
 
-          {activeTab === 'sms-logs' && (
+          {activeTab === 'sms-logs' && role === 'Admin' && (
             <SmsManager 
               key={`sms-${reloadTrigger}`} 
               token={token} 

@@ -100,11 +100,14 @@ class SmsWebhookController {
     }
 
     /**
-     * Authenticated Admin CRUD - GET all SMS logs
+     * Authenticated Admin CRUD - GET all SMS logs (Strictly Admin only)
      */
     public function getSms(Request $request, Response $response): Response {
         if (!$this->isAuthenticated($request)) {
             return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
+        }
+        if (!$this->isAdmin($request)) {
+            return $this->jsonResponse($response, ['error' => 'Forbidden: Admin access required.'], 403);
         }
         
         try {
@@ -116,14 +119,14 @@ class SmsWebhookController {
     }
 
     /**
-     * Authenticated Admin CRUD - DELETE single SMS log
+     * Authenticated Admin CRUD - DELETE single SMS log (Strictly Admin only)
      */
     public function deleteSms(Request $request, Response $response, array $args): Response {
         if (!$this->isAuthenticated($request)) {
             return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
         }
-        if ($this->isReadOnly($request)) {
-            return $this->jsonResponse($response, ['error' => 'View-only access restricted.'], 403);
+        if (!$this->isAdmin($request)) {
+            return $this->jsonResponse($response, ['error' => 'Forbidden: Admin access required.'], 403);
         }
 
         $id = isset($args['id']) ? intval($args['id']) : 0;
@@ -144,14 +147,14 @@ class SmsWebhookController {
     }
 
     /**
-     * Authenticated Admin CRUD - DELETE ALL SMS logs (Bulk clear)
+     * Authenticated Admin CRUD - DELETE ALL SMS logs (Strictly Admin only)
      */
     public function clearAllSms(Request $request, Response $response): Response {
         if (!$this->isAuthenticated($request)) {
             return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
         }
-        if ($this->isReadOnly($request)) {
-            return $this->jsonResponse($response, ['error' => 'View-only access restricted.'], 403);
+        if (!$this->isAdmin($request)) {
+            return $this->jsonResponse($response, ['error' => 'Forbidden: Admin access required.'], 403);
         }
 
         try {
@@ -214,18 +217,18 @@ class SmsWebhookController {
     }
 
     /**
-     * Role authorization check helper
+     * Admin role check helper
      */
-    private function isReadOnly(Request $request): bool {
+    private function isAdmin(Request $request): bool {
         $authHeader = $request->getHeaderLine('Authorization');
         if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
-            return true;
+            return false;
         }
 
         $token = substr($authHeader, 7);
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
-            return true;
+            return false;
         }
 
         $payloadEncoded = $parts[1];
@@ -233,6 +236,6 @@ class SmsWebhookController {
         $payload = json_decode($payloadJson, true);
 
         $user = User::where('username', $payload['user'] ?? '')->first();
-        return !$user || $user->role === 'Viewer';
+        return $user && $user->role === 'Admin';
     }
 }
