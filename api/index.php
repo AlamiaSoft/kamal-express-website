@@ -330,6 +330,11 @@ $app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
 $app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
 $app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
 
+// Admin SMS Forwarding Logs Routes
+$app->get('/admin/sms', [\App\Controllers\SmsWebhookController::class, 'getSms']);
+$app->delete('/admin/sms/{id}', [\App\Controllers\SmsWebhookController::class, 'deleteSms']);
+$app->delete('/admin/sms', [\App\Controllers\SmsWebhookController::class, 'clearAllSms']);
+
 // Admin Users & Roles Routes
 $app->get('/admin/users', [\App\Controllers\UserController::class, 'getUsers']);
 $app->post('/admin/users', [\App\Controllers\UserController::class, 'createUser']);

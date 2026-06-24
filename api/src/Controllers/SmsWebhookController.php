@@ -4,6 +4,7 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use App\Models\User;
 
 class SmsWebhookController {
 
@@ -99,6 +100,72 @@ class SmsWebhookController {
     }
 
     /**
+     * Authenticated Admin CRUD - GET all SMS logs
+     */
+    public function getSms(Request $request, Response $response): Response {
+        if (!$this->isAuthenticated($request)) {
+            return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
+        }
+        
+        try {
+            $sms = Capsule::table('forwarded_sms')->orderBy('id', 'desc')->get();
+            return $this->jsonResponse($response, $sms);
+        } catch (\Exception $e) {
+            return $this->jsonResponse($response, ['error' => 'Failed to fetch SMS records: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Authenticated Admin CRUD - DELETE single SMS log
+     */
+    public function deleteSms(Request $request, Response $response, array $args): Response {
+        if (!$this->isAuthenticated($request)) {
+            return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
+        }
+        if ($this->isReadOnly($request)) {
+            return $this->jsonResponse($response, ['error' => 'View-only access restricted.'], 403);
+        }
+
+        $id = isset($args['id']) ? intval($args['id']) : 0;
+        $record = Capsule::table('forwarded_sms')->where('id', $id)->first();
+        if (!$record) {
+            return $this->jsonResponse($response, ['error' => 'SMS record not found.'], 404);
+        }
+
+        try {
+            Capsule::table('forwarded_sms')->where('id', $id)->delete();
+            return $this->jsonResponse($response, [
+                'success' => true,
+                'message' => 'SMS record deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonResponse($response, ['error' => 'Failed to delete SMS record: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Authenticated Admin CRUD - DELETE ALL SMS logs (Bulk clear)
+     */
+    public function clearAllSms(Request $request, Response $response): Response {
+        if (!$this->isAuthenticated($request)) {
+            return $this->jsonResponse($response, ['error' => 'Unauthorized access.'], 401);
+        }
+        if ($this->isReadOnly($request)) {
+            return $this->jsonResponse($response, ['error' => 'View-only access restricted.'], 403);
+        }
+
+        try {
+            Capsule::table('forwarded_sms')->truncate();
+            return $this->jsonResponse($response, [
+                'success' => true,
+                'message' => 'All forwarded SMS logs have been cleared successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonResponse($response, ['error' => 'Failed to clear SMS records: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Helper to return a JSON response
      */
     private function jsonResponse(Response $response, $data, int $status = 200): Response {
@@ -106,5 +173,66 @@ class SmsWebhookController {
         return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus($status);
+    }
+
+    /**
+     * Authentication check helper
+     */
+    private function isAuthenticated(Request $request): bool {
+        $authHeader = $request->getHeaderLine('Authorization');
+        if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
+            return false;
+        }
+
+        $token = substr($authHeader, 7);
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return false;
+        }
+
+        list($headerEncoded, $payloadEncoded, $signatureProvided) = $parts;
+        $signatureRecomputed = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", JWT_SECRET);
+        $signatureRecomputedEncoded = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signatureRecomputed));
+
+        if (!hash_equals($signatureRecomputedEncoded, $signatureProvided)) {
+            return false;
+        }
+
+        $payloadJson = base64_decode(str_replace(['-', '_'], ['+', '/'], $payloadEncoded));
+        $payload = json_decode($payloadJson, true);
+
+        if (!isset($payload['exp']) || time() > $payload['exp']) {
+            return false;
+        }
+
+        $user = User::where('username', $payload['user'] ?? '')->first();
+        if (!$user || $user->status !== 'Active') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Role authorization check helper
+     */
+    private function isReadOnly(Request $request): bool {
+        $authHeader = $request->getHeaderLine('Authorization');
+        if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
+            return true;
+        }
+
+        $token = substr($authHeader, 7);
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return true;
+        }
+
+        $payloadEncoded = $parts[1];
+        $payloadJson = base64_decode(str_replace(['-', '_'], ['+', '/'], $payloadEncoded));
+        $payload = json_decode($payloadJson, true);
+
+        $user = User::where('username', $payload['user'] ?? '')->first();
+        return !$user || $user->role === 'Viewer';
     }
 }

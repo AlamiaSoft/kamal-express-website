@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Lock, User, LogOut, X, AlertCircle, RefreshCw, Layers,
-  ChevronRight, Shield, Globe, Award, Menu, FileText, PlusCircle, Users
+  ChevronRight, Shield, Globe, Award, Menu, FileText, PlusCircle, Users, MessageSquare
 } from 'lucide-react';
 import InquiryManager from './admin/InquiryManager';
 import SalesManager from './admin/SalesManager';
 import UserManager from './admin/UserManager';
 import WebsiteManager from './admin/WebsiteManager';
+import SmsManager from './admin/SmsManager';
 
 export default function AdminView() {
   // Mobile menu open state
@@ -22,8 +23,8 @@ export default function AdminView() {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Active Tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager'
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager'>('inquiries');
+  // Active Tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager' | 'sms-logs'
+  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'website-manager' | 'sms-logs'>('inquiries');
 
   // Reload trigger to refresh database data in mounted sub-components
   const [reloadTrigger, setReloadTrigger] = useState(0);
@@ -338,6 +339,20 @@ export default function AdminView() {
                   </span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
+
+                <button
+                  onClick={() => { setActiveTab('sms-logs'); setIsMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                    activeTab === 'sms-logs'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
 
@@ -451,6 +466,20 @@ export default function AdminView() {
               </span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
+
+            <button
+              onClick={() => setActiveTab('sms-logs')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                activeTab === 'sms-logs'
+                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <MessageSquare className="w-4 h-4" /> SMS Gateway Logs
+              </span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
 
@@ -506,6 +535,7 @@ export default function AdminView() {
                 {activeTab === 'sales-records' && 'Sales Records Ledger'}
                 {activeTab === 'users' && 'System Users & Access Roles'}
                 {activeTab === 'website-manager' && 'Website Content Manager'}
+                {activeTab === 'sms-logs' && 'SMS Gateway Logs'}
               </span>
             </div>
 
@@ -543,6 +573,7 @@ export default function AdminView() {
                 {activeTab === 'sales-records' && 'Verify and authorize registered sales invoices, check payments received, and export data records.'}
                 {activeTab === 'users' && 'Add staff access credentials, assign system authorizations, or edit active access roles.'}
                 {activeTab === 'website-manager' && 'Manage page variables, customize sliders, write travel blogs, and update visa requirements.'}
+                {activeTab === 'sms-logs' && 'Inspect, filter, or delete SMS messages forwarded from your mobile SMS gateway app.'}
               </p>
             </div>
           </div>
@@ -586,6 +617,15 @@ export default function AdminView() {
               role={role} 
               fullName={fullName}
               username={username}
+              onSessionExpired={handleLogout} 
+            />
+          )}
+
+          {activeTab === 'sms-logs' && (
+            <SmsManager 
+              key={`sms-${reloadTrigger}`} 
+              token={token} 
+              role={role} 
               onSessionExpired={handleLogout} 
             />
           )}
