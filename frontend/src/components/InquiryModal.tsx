@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { X, CheckCircle, Ticket, Phone, Clock, MessageSquare, AlertCircle } from 'lucide-react';
 import { Inquiry } from '../types';
+import { apiUrl } from '../services/api';
 
 interface InquiryModalProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export default function InquiryModal({ isOpen, onClose, prefilledService, prefil
     setErrors([]);
     setIsSubmitting(true);
 
-    fetch('/api/inquiry', {
+    fetch(apiUrl('/inquiry'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

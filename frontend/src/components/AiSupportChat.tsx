@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Sparkles, MessageSquare, ExternalLink, User, RefreshCw } from 'lucide-react';
 
+import { apiUrl } from '../services/api';
+
 interface Message {
   id: string;
   sender: 'user' | 'bot';
@@ -61,8 +63,8 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
     setIsLoading(true);
 
     try {
-      // Endpoint can point to worker URL or proxy endpoint
-      const workerUrl = import.meta.env.VITE_AI_WORKER_URL || '/api/chat';
+      // Endpoint points to configured AI worker or VPS API endpoint
+      const workerUrl = import.meta.env.VITE_AI_WORKER_URL || apiUrl('/chat');
       const response = await fetch(workerUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

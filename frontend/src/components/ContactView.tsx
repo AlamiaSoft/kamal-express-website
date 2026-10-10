@@ -4,6 +4,7 @@ import {
   Ticket, AlertCircle, RefreshCw, Navigation
 } from 'lucide-react';
 import { Inquiry } from '../types';
+import { apiUrl } from '../services/api';
 
 export default function ContactView() {
   const [name, setName] = useState('');
@@ -38,7 +39,7 @@ export default function ContactView() {
 
     setIsSending(true);
 
-    fetch('/api/contact', {
+    fetch(apiUrl('/contact'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiUrl } from '../services/api';
 import {
   Lock, User, LogOut, Search, Filter, Download,
   Phone, Mail, MessageSquare, Save, X, Calendar,
@@ -161,7 +162,7 @@ export default function AdminView() {
     setIsUsersLoading(true);
     setUsersErrorMsg('');
     try {
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch(apiUrl('/admin/users'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -188,7 +189,8 @@ export default function AdminView() {
     setIsSavingUser(true);
     try {
       const isEdit = !!selectedUser;
-      const url = isEdit ? `/api/admin/users/${selectedUser.id}` : '/api/admin/users';
+      const endpoint = isEdit ? `/admin/users/${selectedUser.id}` : '/admin/users';
+      const url = apiUrl(endpoint);
       const method = isEdit ? 'PUT' : 'POST';
       
       const bodyPayload: any = {
@@ -241,7 +243,7 @@ export default function AdminView() {
   const handleDeleteUser = async (userId: number) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(apiUrl(`/admin/users/${userId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -271,7 +273,7 @@ export default function AdminView() {
     setIsSalesLoading(true);
     setSalesErrorMsg('');
     try {
-      const response = await fetch('/api/admin/sales', {
+      const response = await fetch(apiUrl('/admin/sales'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -310,7 +312,7 @@ export default function AdminView() {
 
     setIsSavingSale(true);
     try {
-      const response = await fetch('/api/admin/sales', {
+      const response = await fetch(apiUrl('/admin/sales'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -365,7 +367,7 @@ export default function AdminView() {
 
   const handleUpdateSaleStatus = async (saleId: number, newStatus: 'Approved' | 'Rejected') => {
     try {
-      const response = await fetch(`/api/admin/sales/${saleId}`, {
+      const response = await fetch(apiUrl(`/admin/sales/${saleId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -405,7 +407,7 @@ export default function AdminView() {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      const response = await fetch('/api/admin/inquiries', {
+      const response = await fetch(apiUrl('/admin/inquiries'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -431,7 +433,7 @@ export default function AdminView() {
     setLoginError('');
     setIsLoggingIn(true);
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(apiUrl('/admin/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -489,7 +491,7 @@ export default function AdminView() {
 
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/admin/inquiries/${selectedInquiry.id}`, {
+      const response = await fetch(apiUrl(`/admin/inquiries/${selectedInquiry.id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
