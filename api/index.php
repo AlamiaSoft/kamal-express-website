@@ -84,8 +84,11 @@ try {
 // 3. Initialize Slim App
 $app = AppFactory::create();
 
-// Set base path matching cPanel subdirectory structure (/api)
-$app->setBasePath('/api');
+// Determine base path: if request path begins with /api, use /api; otherwise use root
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+if (strpos($requestUri, '/api') === 0) {
+    $app->setBasePath('/api');
+}
 
 // Add parsing and routing middleware
 $app->addBodyParsingMiddleware();
