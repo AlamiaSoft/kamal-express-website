@@ -1,9 +1,15 @@
+FROM composer:2 AS composer_build
+WORKDIR /app
+COPY api/composer.json ./
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
 FROM serversideup/php:8.3-cli
 
 WORKDIR /app
 
-# Copy API codebase directly (zero compilation required)
+# Copy API codebase and installed vendor directory
 COPY api/ ./
+COPY --from=composer_build /app/vendor ./vendor
 
 EXPOSE 8000
 CMD ["php", "-S", "0.0.0.0:8000", "index.php"]
