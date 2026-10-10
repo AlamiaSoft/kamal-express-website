@@ -72,24 +72,43 @@ On your VPS, Portainer will manage the PHP 8.3 API and MySQL 8.0 database contai
 
 ---
 
-## 3. Cloudflare Tunnel Configuration (`api.kamalexpress.com`)
+## 3. Cloudflare Tunnel Configuration (`api.kamalexpress.com.pk`)
 
-Connect your VPS API to Cloudflare Tunnel without exposing any inbound ports on your server firewall.
+Connect your VPS backend API container to Cloudflare Tunnel without exposing any inbound ports on your server firewall.
 
 1. Open **[Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com)**.
 2. Navigate to **Networks** $\to$ **Tunnels** $\to$ Select your Hetzner Server Tunnel.
 3. Under **Public Hostname**, click **Add a public hostname**:
    * **Subdomain:** `api`
-   * **Domain:** `kamalexpress.com`
+   * **Domain:** `kamalexpress.com.pk` (or `kamalexpress.com`)
    * **Path:** (leave blank)
    * **Service Type:** `HTTP`
-   * **URL:** `localhost:8000` (or `127.0.0.1:8000`)
+   * **URL:** `localhost:8001` (or `127.0.0.1:8001`, matching your `HOST_API_PORT`)
 4. Under **Additional application settings** $\to$ **HTTP Settings**:
    * **HTTP2 / WebSockets Support:** Enabled
    * **Connect Timeout:** 30s
 5. Click **Save hostname**.
 
-*(If you prefer routing through your existing `alamiaconnect.com` domain, you can also map `kesys-api.alamiaconnect.com` $\to$ `localhost:8000`).*
+---
+
+## 4. Connecting Cloudflare Pages to the API
+
+Now connect the Cloudflare Pages frontend (`https://kamalexpress.com.pk`) to the backend API:
+
+### Option A: Cloudflare Pages Proxy (Recommended — Zero CORS Issues)
+In your repository, `frontend/public/_redirects` proxies all `/api/*` requests through Cloudflare directly to your tunnel:
+```text
+/api/*  https://api.kamalexpress.com.pk/:splat  200
+/*      /index.html                             200
+```
+This ensures calls like `POST https://kamalexpress.com.pk/api/admin/login` work seamlessly without cross-origin preflight requests.
+
+### Option B: Cloudflare Pages Environment Variable
+In the Cloudflare Pages Dashboard for `kamal-express-website`:
+- Go to **Settings** $\to$ **Environment variables (production)**:
+  ```ini
+  VITE_API_BASE_URL=https://api.kamalexpress.com.pk
+  ```
 
 ---
 

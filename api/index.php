@@ -168,6 +168,22 @@ $app->post('/chat', function ($request, $response) {
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+// Admin CRM Routes
+$app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
+$app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
+$app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
+
+// Admin Users & Roles Routes
+$app->get('/admin/users', [\App\Controllers\UserController::class, 'getUsers']);
+$app->post('/admin/users', [\App\Controllers\UserController::class, 'createUser']);
+$app->put('/admin/users/{id}', [\App\Controllers\UserController::class, 'updateUser']);
+$app->delete('/admin/users/{id}', [\App\Controllers\UserController::class, 'deleteUser']);
+
+// Admin Sales Routes
+$app->post('/admin/sales', [\App\Controllers\SalesController::class, 'recordSale']);
+$app->get('/admin/sales', [\App\Controllers\SalesController::class, 'getSales']);
+$app->put('/admin/sales/{id}', [\App\Controllers\SalesController::class, 'updateSaleStatus']);
+
 // Email Action Routes (Public)
 $app->get('/sales/approve/{token}', [\App\Controllers\SalesController::class, 'approveViaEmail']);
 $app->get('/sales/reject/{token}', [\App\Controllers\SalesController::class, 'rejectViaEmail']);
