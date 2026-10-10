@@ -1,0 +1,9 @@
+FROM serversideup/php:8.3-cli
+
+WORKDIR /app
+
+# Copy API codebase directly (zero compilation required)
+COPY api/ ./
+
+EXPOSE 8000
+CMD ["php", "-S", "0.0.0.0:8000", "index.php"]

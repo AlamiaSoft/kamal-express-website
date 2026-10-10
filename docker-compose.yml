@@ -1,0 +1,64 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: kamal_web
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: kamal_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+      - ./config:/config
+      - ./config:/app/config
+    environment:
+      - DB_DRIVER=mysql
+      - DB_HOST=db
+      - DB_NAME=kamalexpresswebsite
+      - DB_USER=kamal_user
+      - DB_PASS=kamal_secure_pass_2026
+      - SMTP_HOST=mail.kamalexpress.com.pk
+      - SMTP_PORT=465
+      - SMTP_USER=kamalexp
+      - SMTP_PASS=E#EK&^Tdkwgu364t
+      - SMTP_AUTH=true
+      - SMTP_SECURE=ssl
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: kamal_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secure_pass_2026
+      MYSQL_DATABASE: kamalexpresswebsite
+      MYSQL_USER: kamal_user
+      MYSQL_PASSWORD: kamal_secure_pass_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./api/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_secure_pass_2026"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:

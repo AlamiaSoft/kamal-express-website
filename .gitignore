@@ -26,3 +26,8 @@ pnpm-debug.log*
 lerna-debug.log*
 *.zip
 api/live-config.php
+
+# Local tooling & testing scratch
+.codegraph/
+testing/
+workers/

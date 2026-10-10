@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import InquiryModal from './components/InquiryModal';
+import AiSupportChat from './components/AiSupportChat';
 
 // Views
 import HomeView from './components/HomeView';
@@ -246,6 +247,11 @@ export default function App() {
         prefilledService={modalService}
         prefilledDestination={modalDestination}
       />
+
+      {/* Floating AI Support Assistant */}
+      {currentView !== 'admin' && (
+        <AiSupportChat onOpenInquiry={handleOpenInquiry} />
+      )}
 
       {/* Sticky WhatsApp branded floating button */}
       {currentView !== 'admin' && (

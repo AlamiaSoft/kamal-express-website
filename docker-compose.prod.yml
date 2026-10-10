@@ -1,0 +1,62 @@
+services:
+  api:
+    image: kamal-express-api:prod
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: kamal_api
+    restart: always
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - APP_ENV=production
+      - DB_DRIVER=mysql
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-kamalexpresswebsite}
+      - DB_USER=${DB_USER:-kamal_user}
+      - DB_PASS=${DB_PASS:-kamal_secure_pass_2026}
+      - SMTP_HOST=${SMTP_HOST:-mail.kamalexpress.com.pk}
+      - SMTP_PORT=${SMTP_PORT:-465}
+      - SMTP_USER=${SMTP_USER:-kamalexp}
+      - SMTP_PASS=${SMTP_PASS:-E#EK&^Tdkwgu364t}
+      - SMTP_AUTH=true
+      - SMTP_SECURE=ssl
+      - AI_AGENTS_URL=${AI_AGENTS_URL:-http://host.docker.internal:8080/api/website/chat}
+      - AI_AGENTS_TOKEN=${AI_AGENTS_TOKEN:-ke_website_secret_token_2026}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - kamal_net
+
+  db:
+    image: mysql:8.0
+    container_name: kamal_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-root_prod_pass_2026}
+      MYSQL_DATABASE: ${DB_NAME:-kamalexpresswebsite}
+      MYSQL_USER: ${DB_USER:-kamal_user}
+      MYSQL_PASSWORD: ${DB_PASS:-kamal_secure_pass_2026}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./api/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASS:-root_prod_pass_2026}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kamal_net
+
+networks:
+  kamal_net:
+    name: kamal_network
+
+volumes:
+  db_data:
+    name: kamal_db_data

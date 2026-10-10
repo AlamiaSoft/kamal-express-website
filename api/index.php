@@ -11,75 +11,74 @@ require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
 
 // 2. Setup Eloquent ORM Capsule Connection
-$capsule = new Capsule;
-$capsule->addConnection([
-    'driver'    => DB_DRIVER,
-    'host'      => DB_HOST,
-    'database'  => DB_NAME,
-    'username'  => DB_USER,
-    'password'  => DB_PASS,
-    'charset'   => DB_CHARSET,
-    'collation' => DB_COLLATION,
-    'prefix'    => DB_PREFIX,
-]);
-$capsule->setAsGlobal();
-$capsule->bootEloquent();
-
-// Auto-migration for sales_transactions table if not exists
 try {
-    if (!Capsule::schema()->hasTable('sales_transactions')) {
-        Capsule::schema()->create('sales_transactions', function ($table) {
-            $table->id();
-            $table->string('reference_id', 50)->unique();
-            $table->string('full_name', 100);
-            $table->date('date');
-            $table->string('serial_number', 100);
-            $table->text('services');
-            $table->string('vendor_name', 100);
-            $table->string('country', 100);
-            $table->string('sector', 100);
-            $table->decimal('total_amount', 15, 2);
-            $table->decimal('received_amount', 15, 2);
-            $table->decimal('remaining_amount', 15, 2);
-            $table->string('collectors_name', 100);
-            $table->string('status', 50)->default('Pending Approval');
-            $table->string('approval_token', 100)->nullable();
-            $table->string('ip_address', 45)->nullable();
-            $table->timestamps();
-        });
-    }
-} catch (\Exception $e) {
-    error_log("Eloquent Schema Migration Error: " . $e->getMessage());
-}
+    $capsule = new Capsule;
+    $capsule->addConnection([
+        'driver'    => DB_DRIVER,
+        'host'      => DB_HOST,
+        'database'  => DB_NAME,
+        'username'  => DB_USER,
+        'password'  => DB_PASS,
+        'charset'   => DB_CHARSET,
+        'collation' => DB_COLLATION,
+        'prefix'    => DB_PREFIX,
+        'options'   => [
+            \PDO::ATTR_TIMEOUT => 2,
+        ],
+    ]);
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
 
-// Auto-migration for users table and default user seeding if not exists
-try {
-    if (!Capsule::schema()->hasTable('users')) {
-        Capsule::schema()->create('users', function ($table) {
-            $table->id();
-            $table->string('username', 50)->unique();
-            $table->string('password_hash', 255);
-            $table->string('full_name', 100);
-            $table->string('email', 100)->unique();
-            $table->string('role', 50)->default('Staff'); // 'Admin', 'Staff', 'Viewer'
-            $table->string('status', 50)->default('Active'); // 'Active', 'Suspended'
-            $table->timestamps();
-        });
+    // Auto-migrations if DB connection is available
+    if (@$capsule->getConnection()->getPdo()) {
+        if (!Capsule::schema()->hasTable('sales_transactions')) {
+            Capsule::schema()->create('sales_transactions', function ($table) {
+                $table->id();
+                $table->string('reference_id', 50)->unique();
+                $table->string('full_name', 100);
+                $table->date('date');
+                $table->string('serial_number', 100);
+                $table->text('services');
+                $table->string('vendor_name', 100);
+                $table->string('country', 100);
+                $table->string('sector', 100);
+                $table->decimal('total_amount', 15, 2);
+                $table->decimal('received_amount', 15, 2);
+                $table->decimal('remaining_amount', 15, 2);
+                $table->string('collectors_name', 100);
+                $table->string('status', 50)->default('Pending Approval');
+                $table->string('approval_token', 100)->nullable();
+                $table->string('ip_address', 45)->nullable();
+                $table->timestamps();
+            });
+        }
 
-        // Seed the default Admin user using config credentials
-        Capsule::table('users')->insert([
-            'username'      => ADMIN_USERNAME,
-            'password_hash' => ADMIN_PASSWORD_HASH,
-            'full_name'     => 'System Administrator',
-            'email'         => ADMIN_EMAIL,
-            'role'          => 'Admin',
-            'status'        => 'Active',
-            'created_at'    => date('Y-m-d H:i:s'),
-            'updated_at'    => date('Y-m-d H:i:s')
-        ]);
+        if (!Capsule::schema()->hasTable('users')) {
+            Capsule::schema()->create('users', function ($table) {
+                $table->id();
+                $table->string('username', 50)->unique();
+                $table->string('password_hash', 255);
+                $table->string('full_name', 100);
+                $table->string('email', 100)->unique();
+                $table->string('role', 50)->default('Staff');
+                $table->string('status', 50)->default('Active');
+                $table->timestamps();
+            });
+
+            Capsule::table('users')->insert([
+                'username'      => ADMIN_USERNAME,
+                'password_hash' => ADMIN_PASSWORD_HASH,
+                'full_name'     => 'System Administrator',
+                'email'         => ADMIN_EMAIL,
+                'role'          => 'Admin',
+                'status'        => 'Active',
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s')
+            ]);
+        }
     }
-} catch (\Exception $e) {
-    error_log("Users Schema Migration/Seeding Error: " . $e->getMessage());
+} catch (\Throwable $e) {
+    error_log("Database Connection / Migration Note: " . $e->getMessage());
 }
 
 // 3. Initialize Slim App
@@ -112,21 +111,62 @@ $app->add(function ($request, $handler) {
 $app->post('/inquiry', [\App\Controllers\FormController::class, 'inquiry']);
 $app->post('/contact', [\App\Controllers\FormController::class, 'contact']);
 
-// Admin CRM Routes
-$app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
-$app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
-$app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
+// AI Support Chat Assistant Route — Proxies to KamalExpress-Agents platform
+$app->post('/chat', function ($request, $response) {
+    $rawInput = file_get_contents('php://input');
+    $parsedBody = json_decode($rawInput, true) ?: $request->getParsedBody();
+    $messages = isset($parsedBody['messages']) && is_array($parsedBody['messages']) ? $parsedBody['messages'] : [];
 
-// Admin Users & Roles Routes
-$app->get('/admin/users', [\App\Controllers\UserController::class, 'getUsers']);
-$app->post('/admin/users', [\App\Controllers\UserController::class, 'createUser']);
-$app->put('/admin/users/{id}', [\App\Controllers\UserController::class, 'updateUser']);
-$app->delete('/admin/users/{id}', [\App\Controllers\UserController::class, 'deleteUser']);
+    $userMsg = '';
+    $history = [];
+    foreach ($messages as $m) {
+        if (is_array($m)) {
+            $role = strtolower($m['role'] ?? 'user');
+            $content = $m['content'] ?? $m['text'] ?? '';
+            if ($role === 'user') {
+                $userMsg = (string)$content;
+            } else {
+                $history[] = ['role' => 'assistant', 'content' => (string)$content];
+            }
+        }
+    }
 
-// Admin Sales Routes
-$app->post('/admin/sales', [\App\Controllers\SalesController::class, 'recordSale']);
-$app->get('/admin/sales', [\App\Controllers\SalesController::class, 'getSales']);
-$app->put('/admin/sales/{id}', [\App\Controllers\SalesController::class, 'updateSaleStatus']);
+    $agentsUrl = getenv('AI_AGENTS_URL') ?: 'http://host.docker.internal:8080/api/website/chat';
+    $agentsToken = getenv('AI_AGENTS_TOKEN') ?: 'ke_website_secret_token_2026';
+
+    $ch = curl_init($agentsUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode([
+            'message' => $userMsg,
+            'history' => $history,
+            'session_id' => $parsedBody['session_id'] ?? 'public_website_user'
+        ]),
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'X-Website-Token: ' . $agentsToken
+        ],
+        CURLOPT_TIMEOUT => 25
+    ]);
+
+    $result = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200 && $result) {
+        $decoded = json_decode($result, true);
+        $reply = $decoded['response'] ?? $decoded['reply'] ?? '';
+        $response->getBody()->write(json_encode(['reply' => $reply]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    // Graceful fallback if Agents microservice is starting or unreachable
+    $response->getBody()->write(json_encode([
+        'reply' => "Thank you for reaching out to Kamal Express! Our AI travel team is currently assisting other travelers. Please submit an official inquiry or chat directly with our specialists on WhatsApp."
+    ]));
+    return $response->withHeader('Content-Type', 'application/json');
+});
 
 // Email Action Routes (Public)
 $app->get('/sales/approve/{token}', [\App\Controllers\SalesController::class, 'approveViaEmail']);
