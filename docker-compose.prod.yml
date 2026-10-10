@@ -9,7 +9,7 @@ services:
     expose:
       - "8000"
     ports:
-      - "127.0.0.1:${HOST_API_PORT:-8001}:8000"
+      - "${HOST_API_PORT:-8001}:8000"
     environment:
       - APP_ENV=production
       - DB_DRIVER=mysql
