@@ -17,7 +17,7 @@ define('DB_PREFIX', getenv('DB_PREFIX') ?: '');
 define('SMTP_HOST', getenv('SMTP_HOST') ?: 'mail.kamalexpress.com.pk');
 define('SMTP_PORT', getenv('SMTP_PORT') ? (int)getenv('SMTP_PORT') : 465); // SSL port: 465
 define('SMTP_USER', getenv('SMTP_USER') ?: 'kamalexp');
-define('SMTP_PASS', getenv('SMTP_PASS') ?: 'E#EK&^Tdkwgu364t');
+define('SMTP_PASS', getenv('SMTP_PASS') ?: '');
 define('SMTP_AUTH', getenv('SMTP_AUTH') !== false ? (getenv('SMTP_AUTH') === 'false' ? false : true) : true);
 define('SMTP_SECURE', getenv('SMTP_SECURE') ?: 'ssl'); // 'ssl' for port 465
 

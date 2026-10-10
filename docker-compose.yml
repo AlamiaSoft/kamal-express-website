@@ -31,8 +31,8 @@ services:
       - DB_PASS=kamal_secure_pass_2026
       - SMTP_HOST=mail.kamalexpress.com.pk
       - SMTP_PORT=465
-      - SMTP_USER=kamalexp
-      - SMTP_PASS=E#EK&^Tdkwgu364t
+      - SMTP_USER=${SMTP_USER:-kamalexp}
+      - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_AUTH=true
       - SMTP_SECURE=ssl
     depends_on:

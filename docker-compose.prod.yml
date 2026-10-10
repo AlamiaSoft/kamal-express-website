@@ -20,7 +20,7 @@ services:
       - SMTP_HOST=${SMTP_HOST:-mail.kamalexpress.com.pk}
       - SMTP_PORT=${SMTP_PORT:-465}
       - SMTP_USER=${SMTP_USER:-kamalexp}
-      - SMTP_PASS=${SMTP_PASS:-E#EK&^Tdkwgu364t}
+      - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_AUTH=true
       - SMTP_SECURE=ssl
       - AI_AGENTS_URL=${AI_AGENTS_URL:-http://host.docker.internal:8080/api/website/chat}

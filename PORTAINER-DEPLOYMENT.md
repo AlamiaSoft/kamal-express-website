@@ -61,7 +61,7 @@ On your VPS, Portainer will manage the PHP 8.3 API and MySQL 8.0 database contai
    SMTP_HOST=mail.kamalexpress.com.pk
    SMTP_PORT=465
    SMTP_USER=kamalexp
-   SMTP_PASS=E#EK&^Tdkwgu364t
+   SMTP_PASS=your_smtp_password_here
 
    # AI Agents Integration (Routing to KamalExpress-Agents on host)
    AI_AGENTS_URL=http://host.docker.internal:8085/api/website/chat
