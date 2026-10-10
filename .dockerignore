@@ -1,0 +1,8 @@
+.git
+.gitignore
+node_modules
+frontend/node_modules
+api/vendor
+public_html
+*.log
+.env
