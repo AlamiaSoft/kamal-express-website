@@ -31,6 +31,24 @@ try {
 
     // Auto-migrations if DB connection is available
     if (@$capsule->getConnection()->getPdo()) {
+        if (!Capsule::schema()->hasTable('inquiries')) {
+            Capsule::schema()->create('inquiries', function ($table) {
+                $table->id();
+                $table->string('reference_id', 50)->unique();
+                $table->string('name', 100);
+                $table->string('email', 100);
+                $table->string('phone', 50);
+                $table->string('service_type', 100);
+                $table->string('destination', 100);
+                $table->text('notes')->nullable();
+                $table->text('admin_notes')->nullable();
+                $table->string('status', 50)->default('Pending');
+                $table->boolean('email_sent')->default(false);
+                $table->string('ip_address', 45)->nullable();
+                $table->timestamps();
+            });
+        }
+
         if (!Capsule::schema()->hasTable('sales_transactions')) {
             Capsule::schema()->create('sales_transactions', function ($table) {
                 $table->id();
