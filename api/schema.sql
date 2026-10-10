@@ -54,6 +54,34 @@ CREATE TABLE IF NOT EXISTS `users` (
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 4. Chat Sessions Table (AI Support Logging & Lead Attribution)
+CREATE TABLE IF NOT EXISTS `chat_sessions` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `session_id` VARCHAR(64) NOT NULL UNIQUE,
+  `customer_name` VARCHAR(100) DEFAULT NULL,
+  `customer_phone` VARCHAR(50) DEFAULT NULL,
+  `customer_email` VARCHAR(100) DEFAULT NULL,
+  `service_interest` VARCHAR(100) DEFAULT NULL,
+  `status` VARCHAR(50) DEFAULT 'active',
+  `message_count` INT DEFAULT 0,
+  `inquiry_id` INT DEFAULT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `user_agent` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 5. Chat Messages Table (Multi-turn AI Assistant Transcripts)
+CREATE TABLE IF NOT EXISTS `chat_messages` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `session_id` VARCHAR(64) NOT NULL,
+  `role` VARCHAR(20) NOT NULL,
+  `content` TEXT NOT NULL,
+  `agent_name` VARCHAR(50) DEFAULT 'orchestrator',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_session_id` (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 4. Seed Default Admin User
 -- Default Credentials:
 -- Username: kamal_admin_crm
