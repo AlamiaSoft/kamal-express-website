@@ -15,10 +15,22 @@ interface AiSupportChatProps {
   onOpenInquiry: (service?: string, destination?: string) => void;
 }
 
+const generateSessionId = () => {
+  return 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+};
+
 export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string>(() => {
+    const existing = localStorage.getItem('ke_chat_session_id');
+    if (existing) return existing;
+    const fresh = generateSessionId();
+    localStorage.setItem('ke_chat_session_id', fresh);
+    return fresh;
+  });
+  const [agentBadge, setAgentBadge] = useState<string>('Kamal AI');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -27,6 +39,20 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
+
+  const handleNewChat = () => {
+    const fresh = generateSessionId();
+    setSessionId(fresh);
+    localStorage.setItem('ke_chat_session_id', fresh);
+    setMessages([
+      {
+        id: Date.now().toString(),
+        sender: 'bot',
+        text: 'Assalamu Alaikum! 👋 New chat started. How can I help you today?',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    ]);
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +95,7 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          session_id: sessionId,
           messages: messages.concat(userMsg).map((m) => ({
             role: m.sender === 'user' ? 'user' : 'assistant',
             content: m.text,
@@ -80,6 +107,13 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
       if (response.ok) {
         const data = await response.json();
         botReply = data.reply || data.response || '';
+        if (data.session_id && data.session_id !== sessionId) {
+          setSessionId(data.session_id);
+          localStorage.setItem('ke_chat_session_id', data.session_id);
+        }
+        if (data.agent) {
+          setAgentBadge(data.agent);
+        }
       }
 
       if (!botReply) {
@@ -175,8 +209,8 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
               </div>
               <div>
                 <h3 className="font-semibold text-sm leading-tight flex items-center gap-1.5">
-                  Kamal AI Support
-                  <span className="bg-emerald-500/30 text-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-mono">24/7</span>
+                  {agentBadge || 'Kamal AI Support'}
+                  <span className="bg-emerald-500/30 text-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-mono">LIVE</span>
                 </h3>
                 <p className="text-xs text-emerald-200/80 flex items-center gap-1 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -184,12 +218,22 @@ export default function AiSupportChat({ onOpenInquiry }: AiSupportChatProps) {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-emerald-200 hover:text-white p-1 rounded-lg hover:bg-emerald-800/50 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleNewChat}
+                title="Start New Chat"
+                className="text-emerald-200 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800/50 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                title="Close Chat"
+                className="text-emerald-200 hover:text-white p-1.5 rounded-lg hover:bg-emerald-800/50 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Message Stream */}

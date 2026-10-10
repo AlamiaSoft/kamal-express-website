@@ -5,7 +5,7 @@ import {
   Phone, Mail, MessageSquare, Save, X, Calendar,
   CheckCircle, Clock, AlertCircle, RefreshCw, Layers,
   ChevronRight, ArrowRight, Shield, Globe, Award,
-  DollarSign, FileText, Check, PlusCircle, Users
+  DollarSign, FileText, Check, PlusCircle, Users, Bot
 } from 'lucide-react';
 
 interface InquiryItem {
@@ -39,6 +39,33 @@ interface SalesTransaction {
   collectors_name: string;
   status: 'Pending Approval' | 'Approved' | 'Rejected';
   ip_address: string | null;
+  created_at: string;
+}
+
+interface ChatSessionItem {
+  id: number;
+  session_id: string;
+  visitor_name: string | null;
+  visitor_phone: string | null;
+  visitor_email: string | null;
+  detected_service: string | null;
+  detected_destination: string | null;
+  inquiry_id: number | null;
+  status: 'active' | 'converted_lead' | 'abandoned';
+  message_count: number;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+  updated_at: string;
+  inquiry?: InquiryItem | null;
+}
+
+interface ChatMessageItem {
+  id: number;
+  session_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  agent_name: string | null;
   created_at: string;
 }
 
@@ -86,8 +113,19 @@ export default function AdminView() {
   const [editAdminNotes, setEditAdminNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Navigation active tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users'
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users'>('inquiries');
+  // Navigation active tab: 'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'chats'
+  const [activeTab, setActiveTab] = useState<'inquiries' | 'record-sale' | 'sales-records' | 'users' | 'chats'>('inquiries');
+
+  // AI Chat Conversations states
+  const [chatSessions, setChatSessions] = useState<ChatSessionItem[]>([]);
+  const [isChatsLoading, setIsChatsLoading] = useState(false);
+  const [chatsErrorMsg, setChatsErrorMsg] = useState('');
+  const [selectedChatSession, setSelectedChatSession] = useState<ChatSessionItem | null>(null);
+  const [chatTranscript, setChatTranscript] = useState<ChatMessageItem[]>([]);
+  const [isTranscriptLoading, setIsTranscriptLoading] = useState(false);
+  const [isConvertingChat, setIsConvertingChat] = useState(false);
+  const [chatsSearchQuery, setChatsSearchQuery] = useState('');
+  const [chatsStatusFilter, setChatsStatusFilter] = useState<'All' | 'active' | 'converted_lead'>('All');
 
   // Sales Records Data states
   const [sales, setSales] = useState<SalesTransaction[]>([]);
@@ -154,6 +192,8 @@ export default function AdminView() {
         fetchInquiries();
       } else if (activeTab === 'users' && role === 'Admin') {
         fetchUsers();
+      } else if (activeTab === 'chats') {
+        fetchChatSessions();
       }
     }
   }, [token, activeTab]);
@@ -428,6 +468,90 @@ export default function AdminView() {
     }
   };
 
+  const fetchChatSessions = async () => {
+    setIsChatsLoading(true);
+    setChatsErrorMsg('');
+    try {
+      const response = await fetch(apiUrl('/admin/chats'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 401) {
+        handleLogout();
+        throw new Error('Session expired. Please log in again.');
+      }
+      if (!response.ok) {
+        throw new Error('Failed to fetch AI chat sessions.');
+      }
+      const data = await response.json();
+      setChatSessions(data);
+    } catch (err: any) {
+      setChatsErrorMsg(err.message || 'An error occurred.');
+    } finally {
+      setIsChatsLoading(false);
+    }
+  };
+
+  const fetchChatTranscript = async (session: ChatSessionItem) => {
+    setSelectedChatSession(session);
+    setIsTranscriptLoading(true);
+    try {
+      const response = await fetch(apiUrl(`/admin/chats/${session.session_id}`), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 401) {
+        handleLogout();
+        throw new Error('Session expired.');
+      }
+      if (!response.ok) {
+        throw new Error('Failed to fetch chat transcript.');
+      }
+      const data = await response.json();
+      setChatTranscript(data.messages || []);
+      if (data.session) {
+        setSelectedChatSession(data.session);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to load transcript.');
+    } finally {
+      setIsTranscriptLoading(false);
+    }
+  };
+
+  const handleConvertToLead = async (sessionId: string) => {
+    setIsConvertingChat(true);
+    try {
+      const response = await fetch(apiUrl(`/admin/chats/${sessionId}/convert`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 401) {
+        handleLogout();
+        throw new Error('Session expired.');
+      }
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to convert chat.');
+      }
+      alert('Lead successfully converted! A new CRM inquiry ticket has been generated.');
+      fetchChatSessions();
+      fetchInquiries();
+      // Refresh current transcript view
+      if (selectedChatSession && selectedChatSession.session_id === sessionId) {
+        fetchChatTranscript({ ...selectedChatSession, status: 'converted_lead', inquiry_id: data.inquiry?.id });
+      }
+    } catch (err: any) {
+      alert(err.message || 'Conversion failed.');
+    } finally {
+      setIsConvertingChat(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
@@ -476,6 +600,9 @@ export default function AdminView() {
     setSelectedInquiry(null);
     setSales([]);
     setSelectedSale(null);
+    setChatSessions([]);
+    setSelectedChatSession(null);
+    setChatTranscript([]);
     setActiveTab('inquiries');
   };
 
@@ -589,6 +716,27 @@ export default function AdminView() {
   const uniqueSalesServices = Array.from(
     new Set(sales.flatMap(item => item.services || []))
   );
+
+  // Filter Chat Sessions
+  const filteredChatSessions = chatSessions.filter(item => {
+    const matchesSearch =
+      item.session_id.toLowerCase().includes(chatsSearchQuery.toLowerCase()) ||
+      (item.visitor_name && item.visitor_name.toLowerCase().includes(chatsSearchQuery.toLowerCase())) ||
+      (item.visitor_phone && item.visitor_phone.toLowerCase().includes(chatsSearchQuery.toLowerCase())) ||
+      (item.visitor_email && item.visitor_email.toLowerCase().includes(chatsSearchQuery.toLowerCase())) ||
+      (item.detected_service && item.detected_service.toLowerCase().includes(chatsSearchQuery.toLowerCase())) ||
+      (item.detected_destination && item.detected_destination.toLowerCase().includes(chatsSearchQuery.toLowerCase()));
+
+    const matchesStatus = chatsStatusFilter === 'All' || item.status === chatsStatusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  // Calculate Chat Metrics
+  const totalChatSessions = chatSessions.length;
+  const activeChatSessions = chatSessions.filter(c => c.status === 'active').length;
+  const convertedChatLeads = chatSessions.filter(c => c.status === 'converted_lead').length;
+  const totalChatMessages = chatSessions.reduce((acc, c) => acc + (c.message_count || 0), 0);
 
   // CSV Export Utility
   const handleExportCSV = () => {
@@ -804,7 +952,7 @@ export default function AdminView() {
           {/* Navigation Links list */}
           <div className="px-4 space-y-1">
             <button
-              onClick={() => { setActiveTab('inquiries'); setSelectedInquiry(null); setSelectedSale(null); }}
+              onClick={() => { setActiveTab('inquiries'); setSelectedInquiry(null); setSelectedSale(null); setSelectedChatSession(null); }}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
                 activeTab === 'inquiries'
                   ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
@@ -815,6 +963,27 @@ export default function AdminView() {
                 <Layers className="w-4 h-4" /> Inquiries Board
               </span>
               <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={() => { setActiveTab('chats'); setSelectedInquiry(null); setSelectedSale(null); setSelectedChatSession(null); }}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs cursor-pointer text-left transition-all ${
+                activeTab === 'chats'
+                  ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/10'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold'
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <Bot className="w-4 h-4" /> AI Support Chats
+              </span>
+              <span className="flex items-center gap-1.5">
+                {chatSessions.length > 0 && (
+                  <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded-full font-mono">
+                    {chatSessions.length}
+                  </span>
+                )}
+                <ChevronRight className="w-3.5 h-3.5" />
+              </span>
             </button>
 
             <button
@@ -919,8 +1088,10 @@ export default function AdminView() {
               <ChevronRight className="w-3.5 h-3.5 text-slate-450" />
               <span className="text-slate-800">
                 {activeTab === 'inquiries' && 'Inquiries Board'}
+                {activeTab === 'chats' && 'AI Support Chats'}
                 {activeTab === 'record-sale' && 'Record Sale Form'}
                 {activeTab === 'sales-records' && 'Sales Records'}
+                {activeTab === 'users' && 'Users & Roles'}
               </span>
             </div>
 
@@ -930,12 +1101,13 @@ export default function AdminView() {
                 onClick={() => {
                   if (activeTab === 'sales-records') fetchSales();
                   else if (activeTab === 'users') fetchUsers();
+                  else if (activeTab === 'chats') fetchChatSessions();
                   else fetchInquiries();
                 }}
-                disabled={isLoading || isSalesLoading || isUsersLoading}
+                disabled={isLoading || isSalesLoading || isUsersLoading || isChatsLoading}
                 className="text-slate-500 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer border border-slate-150 bg-white"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isSalesLoading || isUsersLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isSalesLoading || isUsersLoading || isChatsLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Reload Database</span>
               </button>
 
@@ -962,6 +1134,9 @@ export default function AdminView() {
               <p className="text-slate-450 text-xs sm:text-sm font-semibold max-w-xl leading-relaxed">
                 {activeTab === 'inquiries' && (
                   <>You have <span className="text-emerald-700 font-bold">{pendingLeads} pending inquiry tickets</span> requiring immediate coordination or VFS embassy booking actions.</>
+                )}
+                {activeTab === 'chats' && (
+                  <>Monitor visitor conversations with Kamal AI support agents in real time, review complete multi-turn transcripts, and track automatically converted CRM leads.</>
                 )}
                 {activeTab === 'sales-records' && (
                   <>You have <span className="text-amber-700 font-bold">{pendingSalesCount} pending sales transactions</span> requiring approval from the administrator.</>
@@ -1022,7 +1197,7 @@ export default function AdminView() {
           </div>
 
           {/* Metrics Dashboard Row */}
-          {activeTab === 'inquiries' ? (
+          {activeTab === 'inquiries' && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
                 <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
@@ -1064,7 +1239,53 @@ export default function AdminView() {
                 </div>
               </div>
             </div>
-          ) : (
+          )}
+
+          {activeTab === 'chats' && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center shrink-0">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Conversations</span>
+                  <p className="text-xl font-black text-slate-900 leading-tight">{totalChatSessions}</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Active Chats</span>
+                  <p className="text-xl font-black text-slate-900 leading-tight">{activeChatSessions}</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Converted Leads</span>
+                  <p className="text-xl font-black text-slate-900 leading-tight">{convertedChatLeads}</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Messages</span>
+                  <p className="text-xl font-black text-slate-900 leading-tight">{totalChatMessages}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'sales-records' && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4">
                 <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
@@ -1402,6 +1623,296 @@ export default function AdminView() {
                     )}
 
                   </form>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* AI Support Chats Tab */}
+          {activeTab === 'chats' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+              {/* Sessions table card */}
+              <div className={`bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden text-left ${selectedChatSession ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+
+                {/* Table Toolbar controls */}
+                <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-extrabold text-slate-900 block tracking-tight">AI Chat Conversations</h3>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                      {filteredChatSessions.length} Sessions
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    {/* Search input */}
+                    <div className="relative w-full sm:w-48">
+                      <input
+                        type="text"
+                        placeholder="Search phone, email, id..."
+                        value={chatsSearchQuery}
+                        onChange={(e) => setChatsSearchQuery(e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-medium"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                    </div>
+
+                    {/* Status Dropdown */}
+                    <select
+                      value={chatsStatusFilter}
+                      onChange={(e) => setChatsStatusFilter(e.target.value as any)}
+                      className="border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 transition-colors bg-white font-semibold text-slate-700 cursor-pointer"
+                    >
+                      <option value="All">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="converted_lead">Converted Leads</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Error Banner */}
+                {chatsErrorMsg && (
+                  <div className="p-4 bg-red-50 text-red-650 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                    <span>{chatsErrorMsg}</span>
+                  </div>
+                )}
+
+                {/* Loading or Empty State */}
+                {isChatsLoading ? (
+                  <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                    <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
+                    <span className="text-xs font-bold">Loading conversation logs...</span>
+                  </div>
+                ) : filteredChatSessions.length === 0 ? (
+                  <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                    <Bot className="w-8 h-8 text-slate-300" />
+                    <span className="text-xs font-bold text-slate-600">No chat sessions found</span>
+                    <span className="text-[11px] text-slate-400">Visitors interacting with Kamal AI Support widget will appear here automatically.</span>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50/80 text-[10px] text-slate-400 font-extrabold uppercase border-b border-slate-100 tracking-wider">
+                        <tr>
+                          <th className="py-3 px-4">Session & Date</th>
+                          <th className="py-3 px-4">Visitor Contact</th>
+                          <th className="py-3 px-4">Topic / Intent</th>
+                          <th className="py-3 px-4 text-center">Messages</th>
+                          <th className="py-3 px-4">Lead Status</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredChatSessions.map((item) => {
+                          const isSelected = selectedChatSession?.session_id === item.session_id;
+                          return (
+                            <tr
+                              key={item.id}
+                              onClick={() => fetchChatTranscript(item)}
+                              className={`cursor-pointer transition-colors hover:bg-emerald-50/30 ${
+                                isSelected ? 'bg-emerald-50/60 font-semibold' : ''
+                              }`}
+                            >
+                              <td className="py-3.5 px-4">
+                                <div className="font-mono text-[11px] font-bold text-slate-800 truncate max-w-[130px]" title={item.session_id}>
+                                  {item.session_id}
+                                </div>
+                                <div className="text-[10px] text-slate-400 mt-0.5">
+                                  {new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <div className="font-bold text-slate-900">
+                                  {item.visitor_name || (item.visitor_phone ? item.visitor_phone : 'Visitor')}
+                                </div>
+                                {(item.visitor_phone || item.visitor_email) && (
+                                  <div className="text-[10px] text-slate-500 mt-0.5 truncate max-w-[150px]">
+                                    {item.visitor_phone || item.visitor_email}
+                                  </div>
+                                )}
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <span className="inline-block bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-semibold">
+                                  {item.detected_destination || item.detected_service || 'General Support'}
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4 text-center">
+                                <span className="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                  {item.message_count}
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                {item.status === 'converted_lead' ? (
+                                  <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    <Check className="w-3 h-3" /> CRM Lead
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                                    <Clock className="w-3 h-3" /> Chat Only
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="py-3.5 px-4 text-right">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    fetchChatTranscript(item);
+                                  }}
+                                  className="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 font-bold px-2.5 py-1 rounded-lg text-[11px] transition-colors"
+                                >
+                                  Transcript →
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+              </div>
+
+              {/* Chat Transcript slide-over / details column */}
+              {selectedChatSession && (
+                <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden text-left space-y-4 p-5 sm:p-6 sticky top-24">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                        <Bot className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900 leading-tight">Conversation Transcript</h4>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          ID: {selectedChatSession.session_id.substring(0, 16)}...
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedChatSession(null)}
+                      className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Visitor Info Summary Card */}
+                  <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-150 space-y-2.5 text-xs">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Visitor</span>
+                        <p className="font-bold text-slate-800">{selectedChatSession.visitor_name || 'Anonymous'}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Phone</span>
+                        <p className="font-bold text-slate-800">{selectedChatSession.visitor_phone || 'None detected'}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Email</span>
+                        <p className="font-bold text-slate-800 truncate">{selectedChatSession.visitor_email || 'None detected'}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">IP Address</span>
+                        <p className="font-mono text-[11px] text-slate-600">{selectedChatSession.ip_address || 'N/A'}</p>
+                      </div>
+                    </div>
+
+                    {/* Lead Conversion Action Banner */}
+                    <div className="pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                      {selectedChatSession.status === 'converted_lead' ? (
+                        <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Logged in CRM inquiries table</span>
+                          {selectedChatSession.inquiry && (
+                            <span className="text-[11px] font-mono text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">
+                              {selectedChatSession.inquiry.reference_id}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            Not yet captured in CRM
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleConvertToLead(selectedChatSession.session_id)}
+                            disabled={isConvertingChat}
+                            className="bg-emerald-600 hover:bg-emerald-750 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
+                          >
+                            {isConvertingChat ? (
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <PlusCircle className="w-3.5 h-3.5" />
+                            )}
+                            <span>Convert to CRM Lead</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Messages Stream */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">
+                      Live Transcript ({chatTranscript.length} Messages)
+                    </span>
+
+                    {isTranscriptLoading ? (
+                      <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                        <RefreshCw className="w-5 h-5 animate-spin text-emerald-600" />
+                        <span className="text-xs font-semibold">Loading messages...</span>
+                      </div>
+                    ) : chatTranscript.length === 0 ? (
+                      <div className="p-6 text-center text-slate-400 text-xs">
+                        No messages logged for this session.
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50/50 rounded-2xl p-3 border border-slate-150 max-h-[380px] overflow-y-auto space-y-3">
+                        {chatTranscript.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                          >
+                            <div className="flex items-start gap-1.5 max-w-[90%]">
+                              {msg.role !== 'user' && (
+                                <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px]">
+                                  <Bot className="w-3.5 h-3.5" />
+                                </div>
+                              )}
+                              <div
+                                className={`rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-wrap ${
+                                  msg.role === 'user'
+                                    ? 'bg-emerald-700 text-white rounded-tr-none'
+                                    : 'bg-white text-slate-800 rounded-tl-none border border-slate-200 shadow-xs'
+                                }`}
+                              >
+                                {msg.role !== 'user' && msg.agent_name && (
+                                  <div className="text-[10px] font-bold text-emerald-700 mb-1">
+                                    {msg.agent_name}
+                                  </div>
+                                )}
+                                <div>{msg.content}</div>
+                              </div>
+                            </div>
+                            <span className="text-[9px] text-slate-400 mt-0.5 px-1 font-mono">
+                              {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                 </div>
               )}

@@ -186,4 +186,118 @@ class AdminController {
         
         return true;
     }
+
+    /**
+     * List all chat conversation sessions with message count and status
+     */
+    public function getChatSessions(Request $request, Response $response) {
+        if (!$this->isAuthenticated($request)) {
+            $response->getBody()->write(json_encode(['error' => 'Unauthorized access.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+        }
+
+        $sessions = \App\Models\ChatSession::with('inquiry')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $response->getBody()->write(json_encode($sessions));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * Get full message transcript for a specific session ID
+     */
+    public function getChatTranscript(Request $request, Response $response, array $args) {
+        if (!$this->isAuthenticated($request)) {
+            $response->getBody()->write(json_encode(['error' => 'Unauthorized access.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+        }
+
+        $sessionId = $args['sessionId'] ?? '';
+        $session = \App\Models\ChatSession::with('inquiry')
+            ->where('session_id', $sessionId)
+            ->first();
+
+        if (!$session) {
+            $response->getBody()->write(json_encode(['error' => 'Chat session not found.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        $messages = \App\Models\ChatMessage::where('session_id', $sessionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $response->getBody()->write(json_encode([
+            'session' => $session,
+            'messages' => $messages
+        ]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * Manually convert a chat session to an Inquiry lead ticket
+     */
+    public function convertChatToLead(Request $request, Response $response, array $args) {
+        if (!$this->isAuthenticated($request)) {
+            $response->getBody()->write(json_encode(['error' => 'Unauthorized access.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+        }
+
+        $sessionId = $args['sessionId'] ?? '';
+        $session = \App\Models\ChatSession::where('session_id', $sessionId)->first();
+
+        if (!$session) {
+            $response->getBody()->write(json_encode(['error' => 'Chat session not found.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        if ($session->inquiry_id) {
+            $existing = \App\Models\Inquiry::find($session->inquiry_id);
+            if ($existing) {
+                $response->getBody()->write(json_encode([
+                    'success' => true,
+                    'message' => 'Chat session already converted to Inquiry ticket.',
+                    'inquiry' => $existing
+                ]));
+                return $response->withHeader('Content-Type', 'application/json');
+            }
+        }
+
+        $year = date('Y');
+        $rand = rand(1000, 9999);
+        $refId = "KE-CHAT-{$year}-{$rand}";
+
+        // Collect messages summary
+        $recentMessages = \App\Models\ChatMessage::where('session_id', $sessionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+        $transcriptText = "";
+        foreach ($recentMessages as $msg) {
+            $transcriptText .= "[" . strtoupper($msg->role) . "]: " . $msg->content . "\n";
+        }
+
+        $inquiry = \App\Models\Inquiry::create([
+            'reference_id' => $refId,
+            'name' => $session->visitor_name ?: 'Visitor (' . ($session->visitor_phone ?: 'Session ' . substr($sessionId, 0, 8)) . ')',
+            'email' => $session->visitor_email ?: 'chat-lead@kamalexpress.com.pk',
+            'phone' => $session->visitor_phone ?: 'N/A',
+            'service_type' => $session->detected_service ?: 'AI Chat Lead',
+            'destination' => $session->detected_destination ?: 'General Inquiry',
+            'notes' => "Manually converted by staff from Chat Session {$sessionId}.\n\n--- Transcript ---\n" . substr($transcriptText, 0, 1000),
+            'status' => 'Pending',
+            'email_sent' => 0,
+            'ip_address' => $session->ip_address
+        ]);
+
+        $session->inquiry_id = $inquiry->id;
+        $session->status = 'converted_lead';
+        $session->save();
+
+        $response->getBody()->write(json_encode([
+            'success' => true,
+            'message' => 'Successfully converted chat session to Inquiry ticket.',
+            'inquiry' => $inquiry
+        ]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }

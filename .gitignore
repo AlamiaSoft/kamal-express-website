@@ -31,3 +31,4 @@ api/live-config.php
 .codegraph/
 testing/
 workers/
+deployments/

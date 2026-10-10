@@ -94,6 +94,36 @@ try {
                 'updated_at'    => date('Y-m-d H:i:s')
             ]);
         }
+
+        if (!Capsule::schema()->hasTable('chat_sessions')) {
+            Capsule::schema()->create('chat_sessions', function ($table) {
+                $table->id();
+                $table->string('session_id', 64)->unique();
+                $table->string('visitor_name', 100)->nullable();
+                $table->string('visitor_phone', 50)->nullable();
+                $table->string('visitor_email', 100)->nullable();
+                $table->string('detected_service', 100)->nullable();
+                $table->string('detected_destination', 100)->nullable();
+                $table->unsignedBigInteger('inquiry_id')->nullable();
+                $table->string('status', 50)->default('active');
+                $table->integer('message_count')->default(0);
+                $table->string('ip_address', 45)->nullable();
+                $table->text('user_agent')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (!Capsule::schema()->hasTable('chat_messages')) {
+            Capsule::schema()->create('chat_messages', function ($table) {
+                $table->id();
+                $table->string('session_id', 64);
+                $table->string('role', 20); // 'user', 'assistant', 'system'
+                $table->text('content');
+                $table->string('agent_name', 50)->default('orchestrator');
+                $table->timestamp('created_at')->useCurrent();
+                $table->index('session_id');
+            });
+        }
     }
 } catch (\Throwable $e) {
     error_log("Database Connection / Migration Note: " . $e->getMessage());
@@ -152,6 +182,43 @@ $app->post('/chat', function ($request, $response) {
         }
     }
 
+    $sessionId = isset($parsedBody['session_id']) && !empty($parsedBody['session_id'])
+        ? trim($parsedBody['session_id'])
+        : 'ses_' . substr(md5(uniqid(rand(), true)), 0, 16);
+
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+    }
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+    // 1. Log incoming user message to database
+    try {
+        $session = \App\Models\ChatSession::firstOrCreate(
+            ['session_id' => $sessionId],
+            [
+                'status' => 'active',
+                'message_count' => 0,
+                'ip_address' => $ipAddress,
+                'user_agent' => substr($userAgent, 0, 500)
+            ]
+        );
+
+        if (!empty($userMsg)) {
+            \App\Models\ChatMessage::create([
+                'session_id' => $sessionId,
+                'role' => 'user',
+                'content' => $userMsg,
+                'agent_name' => 'client'
+            ]);
+            $session->increment('message_count');
+        }
+    } catch (\Throwable $e) {
+        error_log("Chat Logging Error (User Turn): " . $e->getMessage());
+    }
+
     $agentsUrl = getenv('AI_AGENTS_URL') ?: 'http://host.docker.internal:8080/api/website/chat';
     $agentsToken = getenv('AI_AGENTS_TOKEN') ?: 'ke_website_secret_token_2026';
 
@@ -162,7 +229,7 @@ $app->post('/chat', function ($request, $response) {
         CURLOPT_POSTFIELDS => json_encode([
             'message' => $userMsg,
             'history' => $history,
-            'session_id' => $parsedBody['session_id'] ?? 'public_website_user'
+            'session_id' => $sessionId
         ]),
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
@@ -175,16 +242,92 @@ $app->post('/chat', function ($request, $response) {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
+    $reply = '';
+    $agentName = 'orchestrator';
+
     if ($httpCode === 200 && $result) {
         $decoded = json_decode($result, true);
         $reply = $decoded['response'] ?? $decoded['reply'] ?? '';
-        $response->getBody()->write(json_encode(['reply' => $reply]));
-        return $response->withHeader('Content-Type', 'application/json');
+        $agentName = $decoded['agent'] ?? 'orchestrator';
     }
 
-    // Graceful fallback if Agents microservice is starting or unreachable
+    if (empty($reply)) {
+        $reply = "Thank you for reaching out to Kamal Express! Our AI travel team is currently assisting other travelers. Please submit an official inquiry or chat directly with our specialists on WhatsApp.";
+    }
+
+    // 2. Log assistant response & run lead capture check
+    try {
+        \App\Models\ChatMessage::create([
+            'session_id' => $sessionId,
+            'role' => 'assistant',
+            'content' => $reply,
+            'agent_name' => $agentName
+        ]);
+
+        if (isset($session)) {
+            $session->increment('message_count');
+
+            // Scan conversation for contact details & extract lead
+            if (empty($session->inquiry_id)) {
+                $allUserText = $userMsg;
+                foreach ($history as $h) {
+                    if (($h['role'] ?? '') === 'user') {
+                        $allUserText .= ' ' . ($h['content'] ?? '');
+                    }
+                }
+
+                // Check for phone number (Pakistan format or international)
+                $phoneMatches = [];
+                preg_match('/(?:\+?92|0)[0-9]{2,3}[- ]?[0-9]{7}/', $allUserText, $phoneMatches);
+                $foundPhone = $phoneMatches[0] ?? null;
+
+                // Check for email address
+                $emailMatches = [];
+                preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $allUserText, $emailMatches);
+                $foundEmail = $emailMatches[0] ?? null;
+
+                if ($foundPhone || $foundEmail) {
+                    $year = date('Y');
+                    $rand = rand(1000, 9999);
+                    $refId = "KE-CHAT-{$year}-{$rand}";
+
+                    // Detect destination keywords
+                    $dest = 'General Inquiry';
+                    if (preg_match('/china|beijing|shanghai|csc|jw201/i', $allUserText)) $dest = 'China';
+                    elseif (preg_match('/greece|schengen|athens/i', $allUserText)) $dest = 'Greece';
+                    elseif (preg_match('/umrah|makkah|madinah|saudi/i', $allUserText)) $dest = 'Saudi Arabia';
+                    elseif (preg_match('/uk|london|britain/i', $allUserText)) $dest = 'United Kingdom';
+
+                    $inquiry = \App\Models\Inquiry::create([
+                        'reference_id' => $refId,
+                        'name' => $session->visitor_name ?: 'Website Visitor (' . ($foundPhone ?: $foundEmail) . ')',
+                        'email' => $foundEmail ?: 'chat-lead@kamalexpress.com.pk',
+                        'phone' => $foundPhone ?: 'N/A',
+                        'service_type' => 'AI Chat Lead',
+                        'destination' => $dest,
+                        'notes' => "Captured from AI chat session: {$sessionId}\nLatest message: {$userMsg}",
+                        'status' => 'Pending',
+                        'email_sent' => 0,
+                        'ip_address' => $ipAddress
+                    ]);
+
+                    $session->inquiry_id = $inquiry->id;
+                    $session->status = 'converted_lead';
+                    $session->visitor_phone = $foundPhone;
+                    $session->visitor_email = $foundEmail;
+                    $session->detected_destination = $dest;
+                    $session->save();
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log("Chat Logging Error (Assistant Turn & Lead): " . $e->getMessage());
+    }
+
     $response->getBody()->write(json_encode([
-        'reply' => "Thank you for reaching out to Kamal Express! Our AI travel team is currently assisting other travelers. Please submit an official inquiry or chat directly with our specialists on WhatsApp."
+        'reply' => $reply,
+        'session_id' => $sessionId,
+        'agent' => $agentName
     ]));
     return $response->withHeader('Content-Type', 'application/json');
 });
@@ -193,6 +336,11 @@ $app->post('/chat', function ($request, $response) {
 $app->post('/admin/login', [\App\Controllers\AdminController::class, 'login']);
 $app->get('/admin/inquiries', [\App\Controllers\AdminController::class, 'getInquiries']);
 $app->put('/admin/inquiries/{id}', [\App\Controllers\AdminController::class, 'updateInquiry']);
+
+// Admin Chat Logs & Leads Routes
+$app->get('/admin/chats', [\App\Controllers\AdminController::class, 'getChatSessions']);
+$app->get('/admin/chats/{sessionId}', [\App\Controllers\AdminController::class, 'getChatTranscript']);
+$app->post('/admin/chats/{sessionId}/convert', [\App\Controllers\AdminController::class, 'convertChatToLead']);
 
 // Admin Users & Roles Routes
 $app->get('/admin/users', [\App\Controllers\UserController::class, 'getUsers']);
@@ -231,7 +379,7 @@ $app->get('/diagnose', function ($request, $response) {
     }
     
     // 2. Test tables
-    $tables = ['inquiries', 'sales_transactions', 'users'];
+    $tables = ['inquiries', 'sales_transactions', 'users', 'chat_sessions', 'chat_messages'];
     foreach ($tables as $table) {
         try {
             $exists = Capsule::schema()->hasTable($table);
